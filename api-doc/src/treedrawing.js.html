@@ -541,7 +541,7 @@
 <a name='L526'></a>            <span class="keyword">return</span>;
 <a name='L527'></a>        }
 <a name='L528'></a>
-<a name='L529'></a>        <span class="keyword">if</span> (node.className == <span class="string">"wnode"</span>) {
+<a name='L529'></a>        <span class="keyword">while</span> (!$(node).hasClass(<span class="string">"snode"</span>) &amp;&amp; node != document) {
 <a name='L530'></a>            node = node.parentNode;
 <a name='L531'></a>        }
 <a name='L532'></a>
@@ -1393,7 +1393,7 @@
 <a name='L1378'></a>    saveSearch();
 <a name='L1379'></a>    hideDialogBox();
 <a name='L1380'></a>    var searchCtx = $(".snode"); // TODO: remove sn0
-<a name='L1381'></a>    var incremental = $("#searchInc").attr("checked");
+<a name='L1381'></a>    var incremental = $("#searchInc").val() == "on";
 <a name='L1382'></a>
 <a name='L1383'></a>    if (incremental &amp;&amp; $(".searchmatch").length > 0) {
 <a name='L1384'></a>        var lastMatchTop = $(".searchmatch").last().offset().top;
@@ -2260,651 +2260,664 @@
 <a name='L2245'></a>}
 <a name='L2246'></a>
 <a name='L2247'></a><span class="keyword">function</span> nextValidationError() {
-<a name='L2248'></a>    scrollToNext(<span class="string">".snode[class*=\"FLAG\"],.snode[class$=\"FLAG\"]"</span>);
-<a name='L2249'></a>}
-<a name='L2250'></a>
-<a name='L2251'></a><span class="comment">// ========== Advancing through the file</span>
-<a name='L2252'></a>
-<a name='L2253'></a><span class="keyword">function</span> nextTree(e) {
-<a name='L2254'></a>    e = e || {};
-<a name='L2255'></a>    <span class="keyword">var</span> find = undefined;
-<a name='L2256'></a>    <span class="keyword">if</span> (e.shiftKey) find = <span class="string">"-FLAG"</span>;
-<a name='L2257'></a>    advanceTree(find, <span class="keyword">false</span>, <span class="number">1</span>);
-<a name='L2258'></a>}
-<a name='L2259'></a>
-<a name='L2260'></a><span class="keyword">function</span> prevTree(e) {
-<a name='L2261'></a>    e = e || {};
-<a name='L2262'></a>    <span class="keyword">var</span> find = undefined;
-<a name='L2263'></a>    <span class="keyword">if</span> (e.shiftKey) find = <span class="string">"-FLAG"</span>;
-<a name='L2264'></a>    advanceTree(find, <span class="keyword">false</span>, -<span class="number">1</span>);
-<a name='L2265'></a>}
-<a name='L2266'></a>
-<a name='L2267'></a><span class="keyword">function</span> advanceTree(find, async, offset) {
-<a name='L2268'></a>    <span class="keyword">var</span> theTrees = toLabeledBrackets($(<span class="string">"#editpane"</span>));
-<a name='L2269'></a>    displayInfo(<span class="string">"Fetching tree..."</span>);
-<a name='L2270'></a>    <span class="keyword">return</span> $.ajax(<span class="string">"/advanceTree"</span>,
-<a name='L2271'></a>                  { async: async,
-<a name='L2272'></a>                    success: <span class="keyword">function</span>(res) {
-<a name='L2273'></a>                        <span class="keyword">if</span> (res.result == <span class="string">"failure"</span>) {
-<a name='L2274'></a>                            displayWarning(<span class="string">"Fetching tree failed: "</span> + res.reason);
-<a name='L2275'></a>                        } <span class="keyword">else</span> {
-<a name='L2276'></a>                            <span class="comment">// TODO: what to do about the save warning</span>
-<a name='L2277'></a>                            $(<span class="string">"#editpane"</span>).html(res.tree);
-<a name='L2278'></a>                            documentReadyHandler();
-<a name='L2279'></a>                            nukeUndo();
-<a name='L2280'></a>                            currentIndex = res[<span class="string">'treeIndexStart'</span>] + <span class="number">1</span>;
-<a name='L2281'></a>                            displayInfo(<span class="string">"Tree "</span> + currentIndex + <span class="string">" fetched."</span>);
-<a name='L2282'></a>                            displayTreeIndex(<span class="string">"Editing tree #"</span> + currentIndex +
-<a name='L2283'></a>                                             <span class="string">" out of "</span> + res[<span class="string">'totalTrees'</span>]);
-<a name='L2284'></a>                        }
-<a name='L2285'></a>                    },
-<a name='L2286'></a>                    dataType: <span class="string">"json"</span>,
-<a name='L2287'></a>                    type: <span class="string">"POST"</span>,
-<a name='L2288'></a>                    data: { trees: theTrees,
-<a name='L2289'></a>                            find: find,
-<a name='L2290'></a>                            offset: offset
-<a name='L2291'></a>                          }});
-<a name='L2292'></a>}
-<a name='L2293'></a>
-<a name='L2294'></a><span class="keyword">function</span> displayTreeIndex(text) {
-<a name='L2295'></a>    $(<span class="string">"#treeIndexDisplay"</span>).text(text);
-<a name='L2296'></a>}
-<a name='L2297'></a>
-<a name='L2298'></a><span class="comment">// TODO: test post-merge</span>
-<a name='L2299'></a><span class="keyword">function</span> goToTree() {
-<a name='L2300'></a>    <span class="keyword">function</span> goTo() {
-<a name='L2301'></a>        <span class="keyword">var</span> i;
-<a name='L2302'></a>        <span class="keyword">var</span> treeIndex = $(<span class="string">"#gotoInput"</span>).val();
-<a name='L2303'></a>        advanceTree(undefined, <span class="keyword">false</span>, treeIndex - currentIndex);
-<a name='L2304'></a>        hideDialogBox();
-<a name='L2305'></a>    }
-<a name='L2306'></a>    <span class="keyword">var</span> html = <span class="string">"Enter the index of the tree you'd like to jump to: \
-<a name='L2307'></a>&lt;input type='text' id='gotoInput' value=' ' />&lt;div id='dialogButtons'>&lt;input type='button' id='gotoButton'\
-<a name='L2308'></a> value='GoTo' />&lt;/div>"</span>;
-<a name='L2309'></a>    showDialogBox(<span class="string">"GoTo Tree"</span>, html, goTo);
-<a name='L2310'></a>    $(<span class="string">"#gotoButton"</span>).click(goTo);
-<a name='L2311'></a>    $(<span class="string">"#gotoInput"</span>).focus();
-<a name='L2312'></a>}
-<a name='L2313'></a>
-<a name='L2314'></a><span class="comment">// ========== Event logging and idle</span>
-<a name='L2315'></a>
-<a name='L2316'></a><span class="comment">// =============== Event logging function</span>
-<a name='L2317'></a>
-<a name='L2318'></a><span class="keyword">function</span> logEvent(type, data) {
-<a name='L2319'></a>    data = data || {};
-<a name='L2320'></a>    data.type = type;
-<a name='L2321'></a>    $.ajax(<span class="string">"/doLogEvent"</span>,
-<a name='L2322'></a>          {
-<a name='L2323'></a>              async: <span class="keyword">true</span>,
-<a name='L2324'></a>              dataType: <span class="string">"json"</span>,
-<a name='L2325'></a>              type: <span class="string">"POST"</span>,
-<a name='L2326'></a>              data: { eventData: JSON.stringify(data) },
-<a name='L2327'></a>              traditional: <span class="keyword">true</span>
-<a name='L2328'></a>          });
-<a name='L2329'></a>}
-<a name='L2330'></a>
-<a name='L2331'></a><span class="comment">// =============== Idle timeout</span>
-<a name='L2332'></a>
-<a name='L2333'></a><span class="keyword">var</span> idleTimeout = <span class="keyword">false</span>;
-<a name='L2334'></a><span class="keyword">var</span> isIdle = <span class="keyword">false</span>;
-<a name='L2335'></a>
-<a name='L2336'></a><span class="keyword">function</span> resetIdleTimeout() {
-<a name='L2337'></a>    <span class="keyword">if</span> (idleTimeout) {
-<a name='L2338'></a>        clearTimeout(idleTimeout);
-<a name='L2339'></a>    }
-<a name='L2340'></a>    idleTimeout = setTimeout(autoIdle, <span class="number">30</span> * <span class="number">1000</span>);
-<a name='L2341'></a>}
-<a name='L2342'></a>
-<a name='L2343'></a><span class="keyword">function</span> autoIdle() {
-<a name='L2344'></a>    logEvent(<span class="string">"auto-idle"</span>);
-<a name='L2345'></a>    becomeIdle();
-<a name='L2346'></a>}
-<a name='L2347'></a>
-<a name='L2348'></a>addStartupHook(resetIdleTimeout);
-<a name='L2349'></a>
-<a name='L2350'></a>addKeyDownHook(<span class="keyword">function</span>() {
-<a name='L2351'></a>    unAutoIdle();
-<a name='L2352'></a>    resetIdleTimeout();
-<a name='L2353'></a>});
-<a name='L2354'></a>
-<a name='L2355'></a>addClickHook(<span class="keyword">function</span>() {
-<a name='L2356'></a>    unAutoIdle();
-<a name='L2357'></a>    resetIdleTimeout();
-<a name='L2358'></a>});
-<a name='L2359'></a>
-<a name='L2360'></a><span class="keyword">function</span> unAutoIdle() {
-<a name='L2361'></a>    <span class="keyword">if</span> (isIdle) {
-<a name='L2362'></a>        logEvent(<span class="string">"auto-resume"</span>);
-<a name='L2363'></a>        becomeEditing();
-<a name='L2364'></a>    }
-<a name='L2365'></a>}
-<a name='L2366'></a>
-<a name='L2367'></a><span class="comment">// =============== User interface</span>
-<a name='L2368'></a>
-<a name='L2369'></a><span class="keyword">function</span> becomeIdle() {
-<a name='L2370'></a>    isIdle = <span class="keyword">true</span>;
-<a name='L2371'></a>    $(<span class="string">"#idlestatus"</span>).html(<span class="string">"&lt;div style='color:#C75C5C'>IDLE.&lt;/div>"</span>);
-<a name='L2372'></a>    $(<span class="string">"#butidle"</span>).unbind(<span class="string">"mousedown"</span>).mousedown(resume);
-<a name='L2373'></a>}
-<a name='L2374'></a>
-<a name='L2375'></a><span class="keyword">function</span> becomeEditing() {
-<a name='L2376'></a>    isIdle = <span class="keyword">false</span>;
-<a name='L2377'></a>    $(<span class="string">"#idlestatus"</span>).html(<span class="string">"&lt;div style='color:#64C465'>Editing.&lt;/div>"</span>);
-<a name='L2378'></a>    $(<span class="string">"#butidle"</span>).unbind(<span class="string">"mousedown"</span>).mousedown(idle);
-<a name='L2379'></a>}
-<a name='L2380'></a>
-<a name='L2381'></a><span class="keyword">function</span> idle() {
-<a name='L2382'></a>    logEvent(<span class="string">"user-idle"</span>);
-<a name='L2383'></a>    becomeIdle();
-<a name='L2384'></a>}
-<a name='L2385'></a>
-<a name='L2386'></a><span class="keyword">function</span> resume() {
-<a name='L2387'></a>    logEvent(<span class="string">"user-resume"</span>);
-<a name='L2388'></a>    becomeEditing();
-<a name='L2389'></a>}
-<a name='L2390'></a>
-<a name='L2391'></a><span class="comment">// =============== Key/click logging</span>
-<a name='L2392'></a>
-<a name='L2393'></a>addStartupHook(<span class="keyword">function</span> () {
-<a name='L2394'></a>    <span class="comment">// This must be delayed, because this file is loaded before settings.js is</span>
-<a name='L2395'></a>    <span class="keyword">if</span> (logDetail) {
-<a name='L2396'></a>        addKeyDownHook(<span class="keyword">function</span> (keydata, fn, args) {
-<a name='L2397'></a>            <span class="keyword">var</span> key = (keydata.ctrl ? <span class="string">"C-"</span> : <span class="string">""</span>) +
-<a name='L2398'></a>                    (keydata.shift ? <span class="string">"S-"</span> : <span class="string">""</span>) +
-<a name='L2399'></a>                    String.fromCharCode(keydata.keyCode),
-<a name='L2400'></a>                theFn = fn.name + <span class="string">"("</span> +
-<a name='L2401'></a>                    args.map(<span class="keyword">function</span> (x) { <span class="keyword">return</span> JSON.stringify(x); }).join(<span class="string">", "</span>) +
-<a name='L2402'></a>                    <span class="string">")"</span>;
-<a name='L2403'></a>            logEvent(<span class="string">"keypress"</span>,
-<a name='L2404'></a>                     { key: key,
-<a name='L2405'></a>                       fn: theFn
-<a name='L2406'></a>                     });
-<a name='L2407'></a>        });
-<a name='L2408'></a>
-<a name='L2409'></a>        addClickHook(<span class="keyword">function</span> (button) {
-<a name='L2410'></a>            logEvent(<span class="string">"mouse-click"</span>,
-<a name='L2411'></a>                     { button: button
-<a name='L2412'></a>                     });
-<a name='L2413'></a>        });
-<a name='L2414'></a>
-<a name='L2415'></a>        <span class="comment">// TODO: what about mouse movement?</span>
-<a name='L2416'></a>    }
-<a name='L2417'></a>});
-<a name='L2418'></a>
-<a name='L2419'></a><span class="comment">// ========== Quitting</span>
-<a name='L2420'></a>
-<a name='L2421'></a><span class="keyword">function</span> quitServer(e, force) {
-<a name='L2422'></a>    unAutoIdle();
-<a name='L2423'></a>    <span class="keyword">if</span> (!force &amp;&amp; $(<span class="string">"#editpane"</span>).html() != lastsavedstate) {
-<a name='L2424'></a>        displayError(<span class="string">"Cannot exit, unsaved changes exist.  &lt;a href='#' "</span> +
-<a name='L2425'></a>                    <span class="string">"onclick='quitServer(null, true);return false;'>Force&lt;/a>"</span>);
-<a name='L2426'></a>    } <span class="keyword">else</span> {
-<a name='L2427'></a>        $.post(<span class="string">"/doExit"</span>);
-<a name='L2428'></a>        window.onbeforeunload = undefined;
-<a name='L2429'></a>        setTimeout(<span class="keyword">function</span>(res) {
-<a name='L2430'></a>                       <span class="comment">// I have no idea why this works, but it does</span>
-<a name='L2431'></a>                       window.open(<span class="string">''</span>, <span class="string">'_self'</span>, <span class="string">''</span>);
-<a name='L2432'></a>                       window.close();
-<a name='L2433'></a>               }, <span class="number">100</span>);
-<a name='L2434'></a>    }
-<a name='L2435'></a>}
-<a name='L2436'></a>
-<a name='L2437'></a><span class="comment">// ===== Undo/redo</span>
-<a name='L2438'></a>
-<a name='L2439'></a><span class="comment">// TODO: organize this code</span>
-<a name='L2440'></a>
-<a name='L2441'></a><span class="keyword">var</span> undoMap,
-<a name='L2442'></a>    undoNewTrees,
-<a name='L2443'></a>    undoDeletedTrees,
-<a name='L2444'></a>    undoStack = [],
-<a name='L2445'></a>    redoStack = [],
-<a name='L2446'></a>    undoTransactionStack = [];
-<a name='L2447'></a>
-<a name='L2448'></a><span class="keyword">var</span> idNumber = <span class="number">1</span>;
-<a name='L2449'></a>
-<a name='L2450'></a><span class="keyword">function</span> prepareUndoIds() {
-<a name='L2451'></a>    $(<span class="string">"#sn0>.snode"</span>).map(<span class="keyword">function</span> () {
-<a name='L2452'></a>        $(<span class="keyword">this</span>).attr(<span class="string">"id"</span>, <span class="string">"id"</span> + idNumber);
-<a name='L2453'></a>        idNumber++;
-<a name='L2454'></a>    });
-<a name='L2455'></a>    nukeUndo();
-<a name='L2456'></a>}
-<a name='L2457'></a>
-<a name='L2458'></a>addStartupHook(prepareUndoIds);
-<a name='L2459'></a>
-<a name='L2460'></a><span class="comment">/**
-<a name='L2461'></a> * Reset the undo system.
-<a name='L2462'></a> *
-<a name='L2463'></a> * This function removes any intermediate state the undo system has stored; it
-<a name='L2464'></a> * does not affect the undo history.
-<a name='L2465'></a> *<span class="phpdoc"> @private</span>
-<a name='L2466'></a> */</span>
-<a name='L2467'></a><span class="keyword">function</span> resetUndo() {
-<a name='L2468'></a>    undoMap = {};
-<a name='L2469'></a>    undoNewTrees = [];
-<a name='L2470'></a>    undoDeletedTrees = [];
-<a name='L2471'></a>    undoTransactionStack = [];
-<a name='L2472'></a>}
-<a name='L2473'></a>
-<a name='L2474'></a><span class="comment">/**
-<a name='L2475'></a> * Reset the undo system entirely.
-<a name='L2476'></a> *
-<a name='L2477'></a> * This function zeroes out any undo history.
-<a name='L2478'></a> */</span>
-<a name='L2479'></a><span class="keyword">function</span> nukeUndo() {
-<a name='L2480'></a>    resetUndo();
-<a name='L2481'></a>    undoStack = [];
-<a name='L2482'></a>    redoStack = [];
-<a name='L2483'></a>}
-<a name='L2484'></a>
-<a name='L2485'></a><span class="comment">/**
-<a name='L2486'></a> * Record an undo step.
-<a name='L2487'></a> *<span class="phpdoc"> @private</span>
-<a name='L2488'></a> */</span>
-<a name='L2489'></a><span class="keyword">function</span> undoBarrier() {
-<a name='L2490'></a>    <span class="keyword">if</span> (_.size(undoMap) === <span class="number">0</span> &amp;&amp;
-<a name='L2491'></a>        _.size(undoNewTrees) === <span class="number">0</span> &amp;&amp;
-<a name='L2492'></a>        _.size(undoDeletedTrees) === <span class="number">0</span>) {
-<a name='L2493'></a>        <span class="keyword">return</span>;
-<a name='L2494'></a>    }
-<a name='L2495'></a>    undoStack.push({
-<a name='L2496'></a>        map: undoMap,
-<a name='L2497'></a>        newTr: undoNewTrees,
-<a name='L2498'></a>        delTr: undoDeletedTrees
-<a name='L2499'></a>    });
-<a name='L2500'></a>    resetUndo();
-<a name='L2501'></a>    redoStack = [];
-<a name='L2502'></a>}
-<a name='L2503'></a>
-<a name='L2504'></a><span class="comment">/**
-<a name='L2505'></a> * Begin an undo transaction.
-<a name='L2506'></a> *
-<a name='L2507'></a> * This function MUST be matched by a call to either `undoEndTransaction`
-<a name='L2508'></a> * (which keeps all intermediate steps since the start call) or
-<a name='L2509'></a> * `undoAbortTransaction` (which discards said steps).
-<a name='L2510'></a> */</span>
-<a name='L2511'></a><span class="keyword">function</span> undoBeginTransaction() {
-<a name='L2512'></a>    undoTransactionStack.push({
-<a name='L2513'></a>        map: undoMap,
-<a name='L2514'></a>        newTr: undoNewTrees,
-<a name='L2515'></a>        delTr: undoDeletedTrees
-<a name='L2516'></a>    });
-<a name='L2517'></a>}
-<a name='L2518'></a>
-<a name='L2519'></a><span class="comment">/**
-<a name='L2520'></a> * End an undo transaction, keeping its changes
-<a name='L2521'></a> */</span>
-<a name='L2522'></a><span class="keyword">function</span> undoEndTransaction() {
-<a name='L2523'></a>    undoTransactionStack.pop();
-<a name='L2524'></a>}
-<a name='L2525'></a>
-<a name='L2526'></a><span class="comment">/**
-<a name='L2527'></a> * End an undo transaction, discarding its changes
-<a name='L2528'></a> */</span>
-<a name='L2529'></a><span class="keyword">function</span> undoAbortTransaction() {
-<a name='L2530'></a>    <span class="keyword">var</span> t = undoTransactionStack.pop();
-<a name='L2531'></a>    undoMap = t.map;
-<a name='L2532'></a>    undoNewTrees = t.newTr;
-<a name='L2533'></a>    undoDeletedTrees = t.delTr;
-<a name='L2534'></a>}
-<a name='L2535'></a>
-<a name='L2536'></a><span class="comment">/**
-<a name='L2537'></a> * Execute a function, discarding whatever effects it has on the undo system.
-<a name='L2538'></a> *
-<a name='L2539'></a> *<span class="phpdoc"> @param</span> {Function} fn a function to execute
-<a name='L2540'></a> *
-<a name='L2541'></a> *<span class="phpdoc"> @returns</span> the result of `fn`
-<a name='L2542'></a> */</span>
-<a name='L2543'></a><span class="keyword">function</span> ignoringUndo(fn) {
-<a name='L2544'></a>    <span class="comment">// a bit of a grim hack, but it works</span>
-<a name='L2545'></a>    undoBeginTransaction();
-<a name='L2546'></a>    <span class="keyword">var</span> res = fn();
-<a name='L2547'></a>    undoAbortTransaction();
-<a name='L2548'></a>    <span class="keyword">return</span> res;
-<a name='L2549'></a>}
-<a name='L2550'></a>
-<a name='L2551'></a><span class="comment">/**
-<a name='L2552'></a> * Inform the undo system that changes are being made.
-<a name='L2553'></a> *
-<a name='L2554'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node the node in which changes are being made
-<a name='L2555'></a> */</span>
-<a name='L2556'></a><span class="keyword">function</span> touchTree(node) {
-<a name='L2557'></a>    <span class="keyword">var</span> root = $(getTokenRoot(node));
-<a name='L2558'></a>    <span class="keyword">if</span> (!undoMap[root.attr(<span class="string">"id"</span>)]) {
-<a name='L2559'></a>        undoMap[root.attr(<span class="string">"id"</span>)] = root.<span class="keyword">clone</span>();
-<a name='L2560'></a>    }
-<a name='L2561'></a>}
-<a name='L2562'></a>
-<a name='L2563'></a><span class="comment">/**
-<a name='L2564'></a> * Inform the undo system of the addition of a new tree at the root level.
-<a name='L2565'></a> *
-<a name='L2566'></a> *<span class="phpdoc"> @param</span> {JQuery Node} tree the tree being added
-<a name='L2567'></a> */</span>
-<a name='L2568'></a><span class="keyword">function</span> registerNewRootTree(tree) {
-<a name='L2569'></a>    <span class="keyword">var</span> newid = <span class="string">"id"</span> + idNumber;
-<a name='L2570'></a>    idNumber++;
-<a name='L2571'></a>    undoNewTrees.push(newid);
-<a name='L2572'></a>    tree.attr(<span class="string">"id"</span>, newid);
-<a name='L2573'></a>}
-<a name='L2574'></a>
-<a name='L2575'></a><span class="comment">/**
-<a name='L2576'></a> * Inform the undo system of a tree's removal at the root level
-<a name='L2577'></a> *
-<a name='L2578'></a> *<span class="phpdoc"> @param</span> {JQuery Node} tree the tree being removed
-<a name='L2579'></a> */</span>
-<a name='L2580'></a><span class="keyword">function</span> registerDeletedRootTree(tree) {
-<a name='L2581'></a>    <span class="keyword">var</span> prev = tree.prev();
-<a name='L2582'></a>    <span class="keyword">if</span> (prev.length === <span class="number">0</span>) {
-<a name='L2583'></a>        prev = <span class="keyword">null</span>;
-<a name='L2584'></a>    }
-<a name='L2585'></a>    undoDeletedTrees.push({
-<a name='L2586'></a>        tree: tree,
-<a name='L2587'></a>        before: prev &amp;&amp; prev.attr(<span class="string">"id"</span>)
-<a name='L2588'></a>    });
-<a name='L2589'></a>}
-<a name='L2590'></a>
-<a name='L2591'></a><span class="comment">/**
-<a name='L2592'></a> * Perform an undo operation.
-<a name='L2593'></a> *
-<a name='L2594'></a> * This is a worker function, wrapped by `undo` and `redo`.
-<a name='L2595'></a> *<span class="phpdoc"> @private</span>
-<a name='L2596'></a> */</span>
-<a name='L2597'></a><span class="keyword">function</span> doUndo(undoData) {
-<a name='L2598'></a>    <span class="keyword">var</span> map = {},
-<a name='L2599'></a>        newTr = [],
-<a name='L2600'></a>        delTr = [];
-<a name='L2601'></a>
-<a name='L2602'></a>    _.each(undoData.map, <span class="keyword">function</span>(v, k) {
-<a name='L2603'></a>        <span class="keyword">var</span> theNode = $(<span class="string">"#"</span> + k);
-<a name='L2604'></a>        map[k] = theNode.<span class="keyword">clone</span>();
-<a name='L2605'></a>        theNode.replaceWith(v);
-<a name='L2606'></a>    });
-<a name='L2607'></a>
-<a name='L2608'></a>    <span class="comment">// Add back the deleted trees before removing the new trees, just in case</span>
-<a name='L2609'></a>    <span class="comment">// the insertion point of one of these is going to get zapped.  This</span>
-<a name='L2610'></a>    <span class="comment">// shouldn't happen, though.</span>
-<a name='L2611'></a>    _.each(undoData.delTr, <span class="keyword">function</span>(v) {
-<a name='L2612'></a>        <span class="keyword">var</span> prev = v.before;
-<a name='L2613'></a>        <span class="keyword">if</span> (prev) {
-<a name='L2614'></a>            v.tree.insertAfter($(<span class="string">"#"</span> + prev));
-<a name='L2615'></a>        } <span class="keyword">else</span> {
-<a name='L2616'></a>            v.tree.prependTo($(<span class="string">"#sn0"</span>));
-<a name='L2617'></a>        }
-<a name='L2618'></a>        newTr.push(v.tree.attr(<span class="string">"id"</span>));
-<a name='L2619'></a>    });
-<a name='L2620'></a>
-<a name='L2621'></a>    _.each(undoData.newTr, <span class="keyword">function</span>(v) {
-<a name='L2622'></a>        <span class="keyword">var</span> theNode = $(<span class="string">"#"</span> + v);
-<a name='L2623'></a>        <span class="keyword">var</span> prev = theNode.prev();
-<a name='L2624'></a>        <span class="keyword">if</span> (prev.length === <span class="number">0</span>) {
-<a name='L2625'></a>            prev = <span class="keyword">null</span>;
-<a name='L2626'></a>        }
-<a name='L2627'></a>        delTr.push({
-<a name='L2628'></a>            tree: theNode.<span class="keyword">clone</span>(),
-<a name='L2629'></a>            before: prev &amp;&amp; prev.attr(<span class="string">"id"</span>)
-<a name='L2630'></a>        });
-<a name='L2631'></a>        theNode.remove();
-<a name='L2632'></a>    });
-<a name='L2633'></a>
-<a name='L2634'></a>    <span class="keyword">return</span> {
-<a name='L2635'></a>        map: map,
-<a name='L2636'></a>        newTr: newTr,
-<a name='L2637'></a>        delTr: delTr
-<a name='L2638'></a>    };
-<a name='L2639'></a>}
-<a name='L2640'></a>
-<a name='L2641'></a><span class="comment">/**
-<a name='L2642'></a> * Perform undo.
-<a name='L2643'></a> */</span>
-<a name='L2644'></a><span class="keyword">function</span> undo() {
-<a name='L2645'></a>    <span class="keyword">if</span> (undoStack.length === <span class="number">0</span>) {
-<a name='L2646'></a>        displayWarning(<span class="string">"No further undo information"</span>);
-<a name='L2647'></a>        <span class="keyword">return</span>;
-<a name='L2648'></a>    }
-<a name='L2649'></a>    <span class="keyword">var</span> lastUndo = undoStack.pop();
-<a name='L2650'></a>    redoStack.push(doUndo(lastUndo));
-<a name='L2651'></a>    startnode = endnode = undefined;
-<a name='L2652'></a>    updateSelection();
-<a name='L2653'></a>}
-<a name='L2654'></a>
-<a name='L2655'></a><span class="comment">/**
-<a name='L2656'></a> * Perform redo.
-<a name='L2657'></a> */</span>
-<a name='L2658'></a><span class="keyword">function</span> redo () {
-<a name='L2659'></a>    <span class="keyword">if</span> (redoStack.length === <span class="number">0</span>) {
-<a name='L2660'></a>        displayWarning(<span class="string">"No further redo information"</span>);
-<a name='L2661'></a>        <span class="keyword">return</span>;
-<a name='L2662'></a>    }
-<a name='L2663'></a>    undoStack.push(doUndo(redoStack.pop()));
-<a name='L2664'></a>    startnode = endnode = undefined;
-<a name='L2665'></a>    updateSelection();
-<a name='L2666'></a>}
-<a name='L2667'></a>
-<a name='L2668'></a><span class="comment">// ===== Misc</span>
-<a name='L2669'></a>
-<a name='L2670'></a><span class="comment">/**
-<a name='L2671'></a> * Toggle display of lemmata.
-<a name='L2672'></a> */</span>
-<a name='L2673'></a><span class="keyword">function</span> toggleLemmata() {
-<a name='L2674'></a>    <span class="keyword">if</span> (lemmataHidden) {
-<a name='L2675'></a>        lemmataStyleNode.innerHTML = <span class="string">""</span>;
-<a name='L2676'></a>    } <span class="keyword">else</span> {
-<a name='L2677'></a>        lemmataStyleNode.innerHTML = <span class="string">".lemma { display: none; }"</span>;
-<a name='L2678'></a>    }
-<a name='L2679'></a>    lemmataHidden = !lemmataHidden;
-<a name='L2680'></a>}
-<a name='L2681'></a>
-<a name='L2682'></a><span class="keyword">function</span> fixError() {
-<a name='L2683'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
-<a name='L2684'></a>    <span class="keyword">var</span> sn = $(startnode);
-<a name='L2685'></a>    <span class="keyword">if</span> (hasDashTag(sn, <span class="string">"FLAG"</span>)) {
-<a name='L2686'></a>        toggleExtension(<span class="string">"FLAG"</span>, [<span class="string">"FLAG"</span>]);
-<a name='L2687'></a>    }
-<a name='L2688'></a>    updateSelection();
-<a name='L2689'></a>}
-<a name='L2690'></a>
-<a name='L2691'></a><span class="keyword">function</span> zeroDashTags() {
-<a name='L2692'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
-<a name='L2693'></a>    <span class="keyword">var</span> label = getLabel($(startnode));
-<a name='L2694'></a>    <span class="keyword">var</span> idx = parseIndex(label),
-<a name='L2695'></a>        idxType = parseIndexType(label),
-<a name='L2696'></a>        lab = parseLabel(label);
-<a name='L2697'></a>    <span class="keyword">if</span> (idx == -<span class="number">1</span>) {
-<a name='L2698'></a>        idx = idxType = <span class="string">""</span>;
-<a name='L2699'></a>    }
-<a name='L2700'></a>    touchTree($(startnode));
-<a name='L2701'></a>    setLabelLL($(startnode), lab.split(<span class="string">"-"</span>)[<span class="number">0</span>] + idxType + idx);
-<a name='L2702'></a>}
-<a name='L2703'></a>
-<a name='L2704'></a><span class="comment">// TODO: should allow numeric indices; document</span>
-<a name='L2705'></a><span class="keyword">function</span> basesAndDashes(bases, dashes) {
-<a name='L2706'></a>    <span class="keyword">function</span> _basesAndDashes(string) {
-<a name='L2707'></a>        <span class="keyword">var</span> spl = string.split(<span class="string">"-"</span>);
-<a name='L2708'></a>        <span class="keyword">var</span> b = spl.shift();
-<a name='L2709'></a>        <span class="keyword">return</span> (bases.indexOf(b) > -<span class="number">1</span>) &amp;&amp;
-<a name='L2710'></a>            _.all(spl, <span class="keyword">function</span> (x) { <span class="keyword">return</span> (dashes.indexOf(x) > -<span class="number">1</span>); });
-<a name='L2711'></a>    }
-<a name='L2712'></a>    <span class="keyword">return</span> _basesAndDashes;
-<a name='L2713'></a>}
-<a name='L2714'></a>
-<a name='L2715'></a><span class="keyword">function</span> addLemma(lemma) {
-<a name='L2716'></a>    <span class="comment">// TODO: This only makes sense for dash-format corpora</span>
-<a name='L2717'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
-<a name='L2718'></a>    <span class="keyword">if</span> (!isLeafNode($(startnode)) || isEmpty(wnodeString($(startnode)))) <span class="keyword">return</span>;
-<a name='L2719'></a>    touchTree($(startnode));
-<a name='L2720'></a>    <span class="keyword">var</span> theLemma = $(<span class="string">"&lt;span class='lemma'>-"</span> + lemma +
-<a name='L2721'></a>                     <span class="string">"&lt;/span>"</span>);
-<a name='L2722'></a>    $(startnode).children(<span class="string">".wnode"</span>).append(theLemma);
-<a name='L2723'></a>}
-<a name='L2724'></a>
-<a name='L2725'></a><span class="keyword">function</span> untilSuccess() {
-<a name='L2726'></a>    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; arguments.length; i++) {
-<a name='L2727'></a>        <span class="keyword">var</span> fn = arguments[i][<span class="number">0</span>],
-<a name='L2728'></a>            args = arguments[i].slice(<span class="number">1</span>);
-<a name='L2729'></a>        <span class="keyword">var</span> res = fn.apply(<span class="keyword">null</span>, args);
-<a name='L2730'></a>        <span class="keyword">if</span> (res) {
-<a name='L2731'></a>            <span class="keyword">return</span>;
-<a name='L2732'></a>        }
-<a name='L2733'></a>    }
-<a name='L2734'></a>}
-<a name='L2735'></a>
-<a name='L2736'></a><span class="comment">// ===== Misc (candidates to move to utils)</span>
-<a name='L2737'></a>
-<a name='L2738'></a><span class="comment">// TODO: move to utils?</span>
-<a name='L2739'></a><span class="keyword">function</span> setLeafLabel(node, label) {
-<a name='L2740'></a>    <span class="keyword">if</span> (!node.hasClass(<span class="string">".wnode"</span>)) {
-<a name='L2741'></a>        <span class="comment">// why do we do this?  We should be less fault-tolerant.</span>
-<a name='L2742'></a>        node = node.children(<span class="string">".wnode"</span>).first();
-<a name='L2743'></a>    }
-<a name='L2744'></a>    textNode(node).replaceWith($.trim(label));
-<a name='L2745'></a>}
-<a name='L2746'></a><span class="comment">// TODO: need a setLemma function as well</span>
-<a name='L2747'></a>
-<a name='L2748'></a><span class="comment">// TODO: only called from one place, with indices: possibly specialize name?</span>
-<a name='L2749'></a><span class="keyword">function</span> appendExtension(node, extension, type) {
-<a name='L2750'></a>    <span class="keyword">if</span> (!type) {
-<a name='L2751'></a>        type=<span class="string">"-"</span>;
-<a name='L2752'></a>    }
-<a name='L2753'></a>    <span class="keyword">if</span> (shouldIndexLeaf(node) &amp;&amp; !isNaN(extension)) {
-<a name='L2754'></a>        <span class="comment">// Adding an index to an empty category, and the EC is not an</span>
-<a name='L2755'></a>        <span class="comment">// empty operator.  The final proviso is needed because of</span>
-<a name='L2756'></a>        <span class="comment">// things like the empty WADJP in comparatives.</span>
-<a name='L2757'></a>        <span class="keyword">var</span> oldLabel = textNode(node.children(<span class="string">".wnode"</span>).first()).text();
-<a name='L2758'></a>        setLeafLabel(node, oldLabel + type + extension);
-<a name='L2759'></a>    } <span class="keyword">else</span> {
-<a name='L2760'></a>        setNodeLabel(node, getLabel(node) + type + extension, <span class="keyword">true</span>);
-<a name='L2761'></a>    }
-<a name='L2762'></a>}
-<a name='L2763'></a>
-<a name='L2764'></a><span class="keyword">function</span> removeIndex(node) {
-<a name='L2765'></a>    node = $(node);
-<a name='L2766'></a>    <span class="keyword">if</span> (getIndex(node) == -<span class="number">1</span>) {
-<a name='L2767'></a>        <span class="keyword">return</span>;
-<a name='L2768'></a>    }
-<a name='L2769'></a>    <span class="keyword">var</span> label, setLabelFn;
-<a name='L2770'></a>    <span class="keyword">if</span> (shouldIndexLeaf(node)) {
-<a name='L2771'></a>        label = wnodeString(node);
-<a name='L2772'></a>        setLabelFn = setLeafLabel;
-<a name='L2773'></a>    } <span class="keyword">else</span> {
-<a name='L2774'></a>        label = getLabel(node);
-<a name='L2775'></a>        setLabelFn = setNodeLabel;
-<a name='L2776'></a>    }
-<a name='L2777'></a>    setLabelFn(node,
-<a name='L2778'></a>               label.substr(<span class="number">0</span>, Math.max(label.lastIndexOf(<span class="string">"-"</span>),
-<a name='L2779'></a>                                        label.lastIndexOf(<span class="string">"="</span>))),
-<a name='L2780'></a>               <span class="keyword">true</span>);
-<a name='L2781'></a>}
-<a name='L2782'></a>
-<a name='L2783'></a><span class="comment">// A low-level (LL) version of setLabel.  It is only responsible for changing</span>
-<a name='L2784'></a><span class="comment">// the label; not doing any kind of matching/changing/other crap.</span>
-<a name='L2785'></a><span class="keyword">function</span> setLabelLL(node, label) {
-<a name='L2786'></a>    <span class="keyword">if</span> (node.hasClass(<span class="string">"snode"</span>)) {
-<a name='L2787'></a>        <span class="keyword">if</span> (label[label.length - <span class="number">1</span>] != <span class="string">" "</span>) {
-<a name='L2788'></a>            <span class="comment">// Some other spots in the code depend on the label ending with a</span>
-<a name='L2789'></a>            <span class="comment">// space...</span>
-<a name='L2790'></a>            label += <span class="string">" "</span>;
-<a name='L2791'></a>        }
-<a name='L2792'></a>    } <span class="keyword">else</span> <span class="keyword">if</span> (node.hasClass(<span class="string">"wnode"</span>)) {
-<a name='L2793'></a>        <span class="comment">// Words cannot have a trailing space, or CS barfs on save.</span>
-<a name='L2794'></a>        label = $.trim(label);
-<a name='L2795'></a>    } <span class="keyword">else</span> {
-<a name='L2796'></a>        <span class="comment">// should never happen</span>
-<a name='L2797'></a>        <span class="keyword">return</span>;
-<a name='L2798'></a>    }
-<a name='L2799'></a>    <span class="keyword">var</span> oldLabel = parseLabel(getLabel(node));
-<a name='L2800'></a>    textNode(node).replaceWith(label);
-<a name='L2801'></a>    updateCssClass(node, oldLabel);
-<a name='L2802'></a>}
-<a name='L2803'></a>
-<a name='L2804'></a><span class="comment">/**
-<a name='L2805'></a> * Update the CSS class of a node to reflect its label.
-<a name='L2806'></a> *
-<a name='L2807'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node
-<a name='L2808'></a> *<span class="phpdoc"> @param</span> {String} oldlabel (optional) the former label of this node
-<a name='L2809'></a> */</span>
-<a name='L2810'></a><span class="keyword">function</span> updateCssClass(node, oldlabel) {
-<a name='L2811'></a>    <span class="keyword">if</span> (!node.hasClass(<span class="string">"snode"</span>)) {
-<a name='L2812'></a>        <span class="keyword">return</span>;
-<a name='L2813'></a>    }
-<a name='L2814'></a>    <span class="keyword">if</span> (oldlabel) {
-<a name='L2815'></a>        <span class="comment">// should never be needed, but a bit of defensiveness can't hurt</span>
-<a name='L2816'></a>        oldlabel = parseLabel($.trim(oldlabel));
-<a name='L2817'></a>    } <span class="keyword">else</span> {
-<a name='L2818'></a>        <span class="comment">// oldlabel wasn't supplied -- try to guess</span>
-<a name='L2819'></a>        oldlabel = node.attr(<span class="string">"class"</span>).split(<span class="string">" "</span>);
-<a name='L2820'></a>        oldlabel = _.find(oldlabel, <span class="keyword">function</span> (s) { <span class="keyword">return</span> (/[A-Z-]/).match(s); });
-<a name='L2821'></a>    }
-<a name='L2822'></a>    node.removeClass(oldlabel);
-<a name='L2823'></a>    node.addClass(parseLabel(getLabel(node)));
-<a name='L2824'></a>}
-<a name='L2825'></a>
-<a name='L2826'></a><span class="comment">//================================================== Obsolete/other</span>
-<a name='L2827'></a>
-<a name='L2828'></a><span class="comment">/**
-<a name='L2829'></a> * Sets the label of a node
-<a name='L2830'></a> *
-<a name='L2831'></a> * Contains none of the heuristics of {@link setLabel}.
-<a name='L2832'></a> *
-<a name='L2833'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node the target node
-<a name='L2834'></a> *<span class="phpdoc"> @param</span> {String} label the new label
-<a name='L2835'></a> *<span class="phpdoc"> @param</span> {Boolean} noUndo whether to record this operation for later undo
-<a name='L2836'></a> */</span>
-<a name='L2837'></a><span class="keyword">function</span> setNodeLabel(node, label, noUndo) {
-<a name='L2838'></a>    <span class="comment">// TODO: fold this and setLabelLL together...</span>
-<a name='L2839'></a>    setLabelLL(node, label);
-<a name='L2840'></a>}
-<a name='L2841'></a>
-<a name='L2842'></a><span class="comment">// TODO(AWE): I think that updating labels on changing nodes works, but</span>
-<a name='L2843'></a><span class="comment">// this fn should be interactively called with debugging arg to test this</span>
-<a name='L2844'></a><span class="comment">// supposition.  When I am confident of the behavior of the code, this fn will</span>
-<a name='L2845'></a><span class="comment">// be removed.</span>
-<a name='L2846'></a><span class="keyword">function</span> resetLabelClasses(alertOnError) {
-<a name='L2847'></a>    <span class="keyword">var</span> nodes = $(<span class="string">".snode"</span>).each(
-<a name='L2848'></a>        <span class="keyword">function</span>() {
-<a name='L2849'></a>            <span class="keyword">var</span> node = $(<span class="keyword">this</span>);
-<a name='L2850'></a>            <span class="keyword">var</span> label = $.trim(getLabel(node));
-<a name='L2851'></a>            <span class="keyword">if</span> (alertOnError) {
-<a name='L2852'></a>                <span class="keyword">var</span> classes = node.attr(<span class="string">"class"</span>).split(<span class="string">" "</span>);
-<a name='L2853'></a>                <span class="comment">// This incantation removes a value from an array.</span>
-<a name='L2854'></a>                classes.indexOf(<span class="string">"snode"</span>) >= <span class="number">0</span> &amp;&amp;
-<a name='L2855'></a>                    classes.splice(classes.indexOf(<span class="string">"snode"</span>), <span class="number">1</span>);
-<a name='L2856'></a>                classes.indexOf(label) >= <span class="number">0</span> &amp;&amp;
-<a name='L2857'></a>                    classes.splice(classes.indexOf(label), <span class="number">1</span>);
-<a name='L2858'></a>                <span class="keyword">if</span> (classes.length > <span class="number">0</span>) {
-<a name='L2859'></a>                    alert(<span class="string">"Spurious classes '"</span> + classes.join() +
-<a name='L2860'></a>                          <span class="string">"' detected on node id'"</span> + node.attr(<span class="string">"id"</span>) + <span class="string">"'"</span>);
-<a name='L2861'></a>                }
-<a name='L2862'></a>            }
-<a name='L2863'></a>        node.attr(<span class="string">"class"</span>, <span class="string">"snode "</span> + label);
-<a name='L2864'></a>        });
-<a name='L2865'></a>}
-<a name='L2866'></a>
-<a name='L2867'></a>
-<a name='L2868'></a><span class="comment">// TODO: badly need a DSL for forms</span>
-<a name='L2869'></a>
-<a name='L2870'></a><span class="comment">// Local Variables:</span>
-<a name='L2871'></a><span class="comment">// js2-additional-externs: ("$" "setTimeout" "customCommands\</span>
-<a name='L2872'></a><span class="comment">// " "customConLeafBefore" "customConMenuGroups" "extensions" "leaf_extensions\</span>
-<a name='L2873'></a><span class="comment">// " "clause_extensions" "JSON" "testValidLeafLabel" "testValidPhraseLabel\</span>
-<a name='L2874'></a><span class="comment">// " "_" "startTime" "console" "loadContextMenu" "safeGet\</span>
-<a name='L2875'></a><span class="comment">// " "jsonToTree" "objectToTree" "dictionaryToForm" "formToDictionary\</span>
-<a name='L2876'></a><span class="comment">// " "displayWarning" "displayInfo" "displayError" "isEmpty" "isPossibleTarget\</span>
-<a name='L2877'></a><span class="comment">// " "isRootNode" "isLeafNode" "guessLeafNode" "getTokenRoot" "wnodeString\</span>
-<a name='L2878'></a><span class="comment">// " "currentText" "getLabel" "textNode" "getMetadata" "hasDashTag\</span>
-<a name='L2879'></a><span class="comment">// " "parseIndex" "parseLabel" "parseIndexType" "getIndex" "getIndexType\</span>
-<a name='L2880'></a><span class="comment">// " "shouldIndexLeaf" "maxIndex" "addToIndices" "changeJustLabel\</span>
-<a name='L2881'></a><span class="comment">// " "toggleStringExtension" "lookupNextLabel" "commentTypes\</span>
-<a name='L2882'></a><span class="comment">// " "invisibleCategories" "invisibleRootCategories" "ipnodes" "messageHistory\</span>
-<a name='L2883'></a><span class="comment">// " "scrollToNext" "clearTimeout" "logDetail" "hasLemma" "getLemma\</span>
-<a name='L2884'></a><span class="comment">// " "logDetail")</span>
-<a name='L2885'></a><span class="comment">// indent-tabs-mode: nil</span>
-<a name='L2886'></a><span class="comment">// End:</span>
-<a name='L2887'></a>
+<a name='L2248'></a>    <span class="keyword">var</span> node = scrollToNext(<span class="string">".snode[class*=\"FLAG\"],.snode[class$=\"FLAG\"]"</span>);
+<a name='L2249'></a>    selectNode(node.get(<span class="number">0</span>));
+<a name='L2250'></a>}
+<a name='L2251'></a>
+<a name='L2252'></a><span class="comment">// ========== Advancing through the file</span>
+<a name='L2253'></a>
+<a name='L2254'></a><span class="keyword">function</span> nextTree(e) {
+<a name='L2255'></a>    e = e || {};
+<a name='L2256'></a>    <span class="keyword">var</span> find = undefined;
+<a name='L2257'></a>    <span class="keyword">if</span> (e.shiftKey) find = <span class="string">"-FLAG"</span>;
+<a name='L2258'></a>    advanceTree(find, <span class="keyword">false</span>, <span class="number">1</span>);
+<a name='L2259'></a>}
+<a name='L2260'></a>
+<a name='L2261'></a><span class="keyword">function</span> prevTree(e) {
+<a name='L2262'></a>    e = e || {};
+<a name='L2263'></a>    <span class="keyword">var</span> find = undefined;
+<a name='L2264'></a>    <span class="keyword">if</span> (e.shiftKey) find = <span class="string">"-FLAG"</span>;
+<a name='L2265'></a>    advanceTree(find, <span class="keyword">false</span>, -<span class="number">1</span>);
+<a name='L2266'></a>}
+<a name='L2267'></a>
+<a name='L2268'></a><span class="keyword">function</span> advanceTree(find, async, offset) {
+<a name='L2269'></a>    <span class="keyword">var</span> theTrees = toLabeledBrackets($(<span class="string">"#editpane"</span>));
+<a name='L2270'></a>    displayInfo(<span class="string">"Fetching tree..."</span>);
+<a name='L2271'></a>    <span class="keyword">return</span> $.ajax(<span class="string">"/advanceTree"</span>,
+<a name='L2272'></a>                  { async: async,
+<a name='L2273'></a>                    success: <span class="keyword">function</span>(res) {
+<a name='L2274'></a>                        <span class="keyword">if</span> (res.result == <span class="string">"failure"</span>) {
+<a name='L2275'></a>                            displayWarning(<span class="string">"Fetching tree failed: "</span> + res.reason);
+<a name='L2276'></a>                        } <span class="keyword">else</span> {
+<a name='L2277'></a>                            <span class="comment">// TODO: what to do about the save warning</span>
+<a name='L2278'></a>                            $(<span class="string">"#editpane"</span>).html(res.tree);
+<a name='L2279'></a>                            documentReadyHandler();
+<a name='L2280'></a>                            nukeUndo();
+<a name='L2281'></a>                            currentIndex = res[<span class="string">'treeIndexStart'</span>] + <span class="number">1</span>;
+<a name='L2282'></a>                            displayInfo(<span class="string">"Tree "</span> + currentIndex + <span class="string">" fetched."</span>);
+<a name='L2283'></a>                            displayTreeIndex(<span class="string">"Editing tree #"</span> + currentIndex +
+<a name='L2284'></a>                                             <span class="string">" out of "</span> + res[<span class="string">'totalTrees'</span>]);
+<a name='L2285'></a>                        }
+<a name='L2286'></a>                    },
+<a name='L2287'></a>                    dataType: <span class="string">"json"</span>,
+<a name='L2288'></a>                    type: <span class="string">"POST"</span>,
+<a name='L2289'></a>                    data: { trees: theTrees,
+<a name='L2290'></a>                            find: find,
+<a name='L2291'></a>                            offset: offset
+<a name='L2292'></a>                          }});
+<a name='L2293'></a>}
+<a name='L2294'></a>
+<a name='L2295'></a><span class="keyword">function</span> displayTreeIndex(text) {
+<a name='L2296'></a>    $(<span class="string">"#treeIndexDisplay"</span>).text(text);
+<a name='L2297'></a>}
+<a name='L2298'></a>
+<a name='L2299'></a><span class="comment">// TODO: test post-merge</span>
+<a name='L2300'></a><span class="keyword">function</span> goToTree() {
+<a name='L2301'></a>    <span class="keyword">function</span> goTo() {
+<a name='L2302'></a>        <span class="keyword">var</span> i;
+<a name='L2303'></a>        <span class="keyword">var</span> treeIndex = $(<span class="string">"#gotoInput"</span>).val();
+<a name='L2304'></a>        advanceTree(undefined, <span class="keyword">false</span>, treeIndex - currentIndex);
+<a name='L2305'></a>        hideDialogBox();
+<a name='L2306'></a>    }
+<a name='L2307'></a>    <span class="keyword">var</span> html = <span class="string">"Enter the index of the tree you'd like to jump to: \
+<a name='L2308'></a>&lt;input type='text' id='gotoInput' value=' ' />&lt;div id='dialogButtons'>&lt;input type='button' id='gotoButton'\
+<a name='L2309'></a> value='GoTo' />&lt;/div>"</span>;
+<a name='L2310'></a>    showDialogBox(<span class="string">"GoTo Tree"</span>, html, goTo);
+<a name='L2311'></a>    $(<span class="string">"#gotoButton"</span>).click(goTo);
+<a name='L2312'></a>    $(<span class="string">"#gotoInput"</span>).focus();
+<a name='L2313'></a>}
+<a name='L2314'></a>
+<a name='L2315'></a><span class="comment">// ========== Event logging and idle</span>
+<a name='L2316'></a>
+<a name='L2317'></a><span class="comment">// =============== Event logging function</span>
+<a name='L2318'></a>
+<a name='L2319'></a><span class="keyword">function</span> logEvent(type, data) {
+<a name='L2320'></a>    data = data || {};
+<a name='L2321'></a>    data.type = type;
+<a name='L2322'></a>    $.ajax(<span class="string">"/doLogEvent"</span>,
+<a name='L2323'></a>          {
+<a name='L2324'></a>              async: <span class="keyword">true</span>,
+<a name='L2325'></a>              dataType: <span class="string">"json"</span>,
+<a name='L2326'></a>              type: <span class="string">"POST"</span>,
+<a name='L2327'></a>              data: { eventData: JSON.stringify(data) },
+<a name='L2328'></a>              traditional: <span class="keyword">true</span>
+<a name='L2329'></a>          });
+<a name='L2330'></a>}
+<a name='L2331'></a>
+<a name='L2332'></a><span class="comment">// =============== Idle timeout</span>
+<a name='L2333'></a>
+<a name='L2334'></a><span class="keyword">var</span> idleTimeout = <span class="keyword">false</span>;
+<a name='L2335'></a><span class="keyword">var</span> isIdle = <span class="keyword">false</span>;
+<a name='L2336'></a>
+<a name='L2337'></a><span class="keyword">function</span> resetIdleTimeout() {
+<a name='L2338'></a>    <span class="keyword">if</span> (idleTimeout) {
+<a name='L2339'></a>        clearTimeout(idleTimeout);
+<a name='L2340'></a>    }
+<a name='L2341'></a>    idleTimeout = setTimeout(autoIdle, <span class="number">30</span> * <span class="number">1000</span>);
+<a name='L2342'></a>}
+<a name='L2343'></a>
+<a name='L2344'></a><span class="keyword">function</span> autoIdle() {
+<a name='L2345'></a>    logEvent(<span class="string">"auto-idle"</span>);
+<a name='L2346'></a>    becomeIdle();
+<a name='L2347'></a>}
+<a name='L2348'></a>
+<a name='L2349'></a>addStartupHook(resetIdleTimeout);
+<a name='L2350'></a>
+<a name='L2351'></a>addKeyDownHook(<span class="keyword">function</span>() {
+<a name='L2352'></a>    unAutoIdle();
+<a name='L2353'></a>    resetIdleTimeout();
+<a name='L2354'></a>});
+<a name='L2355'></a>
+<a name='L2356'></a>addClickHook(<span class="keyword">function</span>() {
+<a name='L2357'></a>    unAutoIdle();
+<a name='L2358'></a>    resetIdleTimeout();
+<a name='L2359'></a>});
+<a name='L2360'></a>
+<a name='L2361'></a><span class="keyword">function</span> unAutoIdle() {
+<a name='L2362'></a>    <span class="keyword">if</span> (isIdle) {
+<a name='L2363'></a>        logEvent(<span class="string">"auto-resume"</span>);
+<a name='L2364'></a>        becomeEditing();
+<a name='L2365'></a>    }
+<a name='L2366'></a>}
+<a name='L2367'></a>
+<a name='L2368'></a><span class="comment">// =============== User interface</span>
+<a name='L2369'></a>
+<a name='L2370'></a><span class="keyword">function</span> becomeIdle() {
+<a name='L2371'></a>    isIdle = <span class="keyword">true</span>;
+<a name='L2372'></a>    $(<span class="string">"#idlestatus"</span>).html(<span class="string">"&lt;div style='color:#C75C5C'>IDLE.&lt;/div>"</span>);
+<a name='L2373'></a>    $(<span class="string">"#butidle"</span>).unbind(<span class="string">"mousedown"</span>).mousedown(resume);
+<a name='L2374'></a>}
+<a name='L2375'></a>
+<a name='L2376'></a><span class="keyword">function</span> becomeEditing() {
+<a name='L2377'></a>    isIdle = <span class="keyword">false</span>;
+<a name='L2378'></a>    $(<span class="string">"#idlestatus"</span>).html(<span class="string">"&lt;div style='color:#64C465'>Editing.&lt;/div>"</span>);
+<a name='L2379'></a>    $(<span class="string">"#butidle"</span>).unbind(<span class="string">"mousedown"</span>).mousedown(idle);
+<a name='L2380'></a>}
+<a name='L2381'></a>
+<a name='L2382'></a><span class="keyword">function</span> idle() {
+<a name='L2383'></a>    logEvent(<span class="string">"user-idle"</span>);
+<a name='L2384'></a>    becomeIdle();
+<a name='L2385'></a>}
+<a name='L2386'></a>
+<a name='L2387'></a><span class="keyword">function</span> resume() {
+<a name='L2388'></a>    logEvent(<span class="string">"user-resume"</span>);
+<a name='L2389'></a>    becomeEditing();
+<a name='L2390'></a>}
+<a name='L2391'></a>
+<a name='L2392'></a><span class="comment">// =============== Key/click logging</span>
+<a name='L2393'></a>
+<a name='L2394'></a>addStartupHook(<span class="keyword">function</span> () {
+<a name='L2395'></a>    <span class="comment">// This must be delayed, because this file is loaded before settings.js is</span>
+<a name='L2396'></a>    <span class="keyword">if</span> (logDetail) {
+<a name='L2397'></a>        addKeyDownHook(<span class="keyword">function</span> (keydata, fn, args) {
+<a name='L2398'></a>            <span class="keyword">var</span> key = (keydata.ctrl ? <span class="string">"C-"</span> : <span class="string">""</span>) +
+<a name='L2399'></a>                    (keydata.shift ? <span class="string">"S-"</span> : <span class="string">""</span>) +
+<a name='L2400'></a>                    String.fromCharCode(keydata.keyCode),
+<a name='L2401'></a>                theFn = fn.name + <span class="string">"("</span> +
+<a name='L2402'></a>                    args.map(<span class="keyword">function</span> (x) { <span class="keyword">return</span> JSON.stringify(x); }).join(<span class="string">", "</span>) +
+<a name='L2403'></a>                    <span class="string">")"</span>;
+<a name='L2404'></a>            logEvent(<span class="string">"keypress"</span>,
+<a name='L2405'></a>                     { key: key,
+<a name='L2406'></a>                       fn: theFn
+<a name='L2407'></a>                     });
+<a name='L2408'></a>        });
+<a name='L2409'></a>
+<a name='L2410'></a>        addClickHook(<span class="keyword">function</span> (button) {
+<a name='L2411'></a>            logEvent(<span class="string">"mouse-click"</span>,
+<a name='L2412'></a>                     { button: button
+<a name='L2413'></a>                     });
+<a name='L2414'></a>        });
+<a name='L2415'></a>
+<a name='L2416'></a>        <span class="comment">// TODO: what about mouse movement?</span>
+<a name='L2417'></a>    }
+<a name='L2418'></a>});
+<a name='L2419'></a>
+<a name='L2420'></a><span class="comment">// ========== Quitting</span>
+<a name='L2421'></a>
+<a name='L2422'></a><span class="keyword">function</span> quitServer(e, force) {
+<a name='L2423'></a>    unAutoIdle();
+<a name='L2424'></a>    <span class="keyword">if</span> (!force &amp;&amp; $(<span class="string">"#editpane"</span>).html() != lastsavedstate) {
+<a name='L2425'></a>        displayError(<span class="string">"Cannot exit, unsaved changes exist.  &lt;a href='#' "</span> +
+<a name='L2426'></a>                    <span class="string">"onclick='quitServer(null, true);return false;'>Force&lt;/a>"</span>);
+<a name='L2427'></a>    } <span class="keyword">else</span> {
+<a name='L2428'></a>        $.post(<span class="string">"/doExit"</span>);
+<a name='L2429'></a>        window.onbeforeunload = undefined;
+<a name='L2430'></a>        setTimeout(<span class="keyword">function</span>(res) {
+<a name='L2431'></a>                       <span class="comment">// I have no idea why this works, but it does</span>
+<a name='L2432'></a>                       window.open(<span class="string">''</span>, <span class="string">'_self'</span>, <span class="string">''</span>);
+<a name='L2433'></a>                       window.close();
+<a name='L2434'></a>               }, <span class="number">100</span>);
+<a name='L2435'></a>    }
+<a name='L2436'></a>}
+<a name='L2437'></a>
+<a name='L2438'></a><span class="comment">// ===== Undo/redo</span>
+<a name='L2439'></a>
+<a name='L2440'></a><span class="comment">// TODO: organize this code</span>
+<a name='L2441'></a>
+<a name='L2442'></a><span class="keyword">var</span> undoMap,
+<a name='L2443'></a>    undoNewTrees,
+<a name='L2444'></a>    undoDeletedTrees,
+<a name='L2445'></a>    undoStack = [],
+<a name='L2446'></a>    redoStack = [],
+<a name='L2447'></a>    undoTransactionStack = [];
+<a name='L2448'></a>
+<a name='L2449'></a><span class="keyword">var</span> idNumber = <span class="number">1</span>;
+<a name='L2450'></a>
+<a name='L2451'></a><span class="keyword">function</span> prepareUndoIds() {
+<a name='L2452'></a>    $(<span class="string">"#sn0>.snode"</span>).map(<span class="keyword">function</span> () {
+<a name='L2453'></a>        $(<span class="keyword">this</span>).attr(<span class="string">"id"</span>, <span class="string">"id"</span> + idNumber);
+<a name='L2454'></a>        idNumber++;
+<a name='L2455'></a>    });
+<a name='L2456'></a>    nukeUndo();
+<a name='L2457'></a>}
+<a name='L2458'></a>
+<a name='L2459'></a>addStartupHook(prepareUndoIds);
+<a name='L2460'></a>
+<a name='L2461'></a><span class="comment">/**
+<a name='L2462'></a> * Reset the undo system.
+<a name='L2463'></a> *
+<a name='L2464'></a> * This function removes any intermediate state the undo system has stored; it
+<a name='L2465'></a> * does not affect the undo history.
+<a name='L2466'></a> *<span class="phpdoc"> @private</span>
+<a name='L2467'></a> */</span>
+<a name='L2468'></a><span class="keyword">function</span> resetUndo() {
+<a name='L2469'></a>    undoMap = {};
+<a name='L2470'></a>    undoNewTrees = [];
+<a name='L2471'></a>    undoDeletedTrees = [];
+<a name='L2472'></a>    undoTransactionStack = [];
+<a name='L2473'></a>}
+<a name='L2474'></a>
+<a name='L2475'></a><span class="comment">/**
+<a name='L2476'></a> * Reset the undo system entirely.
+<a name='L2477'></a> *
+<a name='L2478'></a> * This function zeroes out any undo history.
+<a name='L2479'></a> */</span>
+<a name='L2480'></a><span class="keyword">function</span> nukeUndo() {
+<a name='L2481'></a>    resetUndo();
+<a name='L2482'></a>    undoStack = [];
+<a name='L2483'></a>    redoStack = [];
+<a name='L2484'></a>}
+<a name='L2485'></a>
+<a name='L2486'></a><span class="comment">/**
+<a name='L2487'></a> * Record an undo step.
+<a name='L2488'></a> *<span class="phpdoc"> @private</span>
+<a name='L2489'></a> */</span>
+<a name='L2490'></a><span class="keyword">function</span> undoBarrier() {
+<a name='L2491'></a>    <span class="keyword">if</span> (_.size(undoMap) === <span class="number">0</span> &amp;&amp;
+<a name='L2492'></a>        _.size(undoNewTrees) === <span class="number">0</span> &amp;&amp;
+<a name='L2493'></a>        _.size(undoDeletedTrees) === <span class="number">0</span>) {
+<a name='L2494'></a>        <span class="keyword">return</span>;
+<a name='L2495'></a>    }
+<a name='L2496'></a>    undoStack.push({
+<a name='L2497'></a>        map: undoMap,
+<a name='L2498'></a>        newTr: undoNewTrees,
+<a name='L2499'></a>        delTr: undoDeletedTrees
+<a name='L2500'></a>    });
+<a name='L2501'></a>    resetUndo();
+<a name='L2502'></a>    redoStack = [];
+<a name='L2503'></a>}
+<a name='L2504'></a>
+<a name='L2505'></a><span class="comment">/**
+<a name='L2506'></a> * Begin an undo transaction.
+<a name='L2507'></a> *
+<a name='L2508'></a> * This function MUST be matched by a call to either `undoEndTransaction`
+<a name='L2509'></a> * (which keeps all intermediate steps since the start call) or
+<a name='L2510'></a> * `undoAbortTransaction` (which discards said steps).
+<a name='L2511'></a> */</span>
+<a name='L2512'></a><span class="keyword">function</span> undoBeginTransaction() {
+<a name='L2513'></a>    undoTransactionStack.push({
+<a name='L2514'></a>        map: undoMap,
+<a name='L2515'></a>        newTr: undoNewTrees,
+<a name='L2516'></a>        delTr: undoDeletedTrees
+<a name='L2517'></a>    });
+<a name='L2518'></a>}
+<a name='L2519'></a>
+<a name='L2520'></a><span class="comment">/**
+<a name='L2521'></a> * End an undo transaction, keeping its changes
+<a name='L2522'></a> */</span>
+<a name='L2523'></a><span class="keyword">function</span> undoEndTransaction() {
+<a name='L2524'></a>    undoTransactionStack.pop();
+<a name='L2525'></a>}
+<a name='L2526'></a>
+<a name='L2527'></a><span class="comment">/**
+<a name='L2528'></a> * End an undo transaction, discarding its changes
+<a name='L2529'></a> */</span>
+<a name='L2530'></a><span class="keyword">function</span> undoAbortTransaction() {
+<a name='L2531'></a>    <span class="keyword">var</span> t = undoTransactionStack.pop();
+<a name='L2532'></a>    undoMap = t.map;
+<a name='L2533'></a>    undoNewTrees = t.newTr;
+<a name='L2534'></a>    undoDeletedTrees = t.delTr;
+<a name='L2535'></a>}
+<a name='L2536'></a>
+<a name='L2537'></a><span class="comment">/**
+<a name='L2538'></a> * Execute a function, discarding whatever effects it has on the undo system.
+<a name='L2539'></a> *
+<a name='L2540'></a> *<span class="phpdoc"> @param</span> {Function} fn a function to execute
+<a name='L2541'></a> *
+<a name='L2542'></a> *<span class="phpdoc"> @returns</span> the result of `fn`
+<a name='L2543'></a> */</span>
+<a name='L2544'></a><span class="keyword">function</span> ignoringUndo(fn) {
+<a name='L2545'></a>    <span class="comment">// a bit of a grim hack, but it works</span>
+<a name='L2546'></a>    undoBeginTransaction();
+<a name='L2547'></a>    <span class="keyword">var</span> res = fn();
+<a name='L2548'></a>    undoAbortTransaction();
+<a name='L2549'></a>    <span class="keyword">return</span> res;
+<a name='L2550'></a>}
+<a name='L2551'></a>
+<a name='L2552'></a><span class="comment">/**
+<a name='L2553'></a> * Inform the undo system that changes are being made.
+<a name='L2554'></a> *
+<a name='L2555'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node the node in which changes are being made
+<a name='L2556'></a> */</span>
+<a name='L2557'></a><span class="keyword">function</span> touchTree(node) {
+<a name='L2558'></a>    <span class="keyword">var</span> root = $(getTokenRoot(node));
+<a name='L2559'></a>    <span class="keyword">if</span> (!undoMap[root.attr(<span class="string">"id"</span>)]) {
+<a name='L2560'></a>        undoMap[root.attr(<span class="string">"id"</span>)] = root.<span class="keyword">clone</span>();
+<a name='L2561'></a>    }
+<a name='L2562'></a>}
+<a name='L2563'></a>
+<a name='L2564'></a><span class="comment">/**
+<a name='L2565'></a> * Inform the undo system of the addition of a new tree at the root level.
+<a name='L2566'></a> *
+<a name='L2567'></a> *<span class="phpdoc"> @param</span> {JQuery Node} tree the tree being added
+<a name='L2568'></a> */</span>
+<a name='L2569'></a><span class="keyword">function</span> registerNewRootTree(tree) {
+<a name='L2570'></a>    <span class="keyword">var</span> newid = <span class="string">"id"</span> + idNumber;
+<a name='L2571'></a>    idNumber++;
+<a name='L2572'></a>    undoNewTrees.push(newid);
+<a name='L2573'></a>    tree.attr(<span class="string">"id"</span>, newid);
+<a name='L2574'></a>}
+<a name='L2575'></a>
+<a name='L2576'></a><span class="comment">/**
+<a name='L2577'></a> * Inform the undo system of a tree's removal at the root level
+<a name='L2578'></a> *
+<a name='L2579'></a> *<span class="phpdoc"> @param</span> {JQuery Node} tree the tree being removed
+<a name='L2580'></a> */</span>
+<a name='L2581'></a><span class="keyword">function</span> registerDeletedRootTree(tree) {
+<a name='L2582'></a>    <span class="keyword">var</span> prev = tree.prev();
+<a name='L2583'></a>    <span class="keyword">if</span> (prev.length === <span class="number">0</span>) {
+<a name='L2584'></a>        prev = <span class="keyword">null</span>;
+<a name='L2585'></a>    }
+<a name='L2586'></a>    undoDeletedTrees.push({
+<a name='L2587'></a>        tree: tree,
+<a name='L2588'></a>        before: prev &amp;&amp; prev.attr(<span class="string">"id"</span>)
+<a name='L2589'></a>    });
+<a name='L2590'></a>}
+<a name='L2591'></a>
+<a name='L2592'></a><span class="comment">/**
+<a name='L2593'></a> * Perform an undo operation.
+<a name='L2594'></a> *
+<a name='L2595'></a> * This is a worker function, wrapped by `undo` and `redo`.
+<a name='L2596'></a> *<span class="phpdoc"> @private</span>
+<a name='L2597'></a> */</span>
+<a name='L2598'></a><span class="keyword">function</span> doUndo(undoData) {
+<a name='L2599'></a>    <span class="keyword">var</span> map = {},
+<a name='L2600'></a>        newTr = [],
+<a name='L2601'></a>        delTr = [];
+<a name='L2602'></a>
+<a name='L2603'></a>    _.each(undoData.map, <span class="keyword">function</span>(v, k) {
+<a name='L2604'></a>        <span class="keyword">var</span> theNode = $(<span class="string">"#"</span> + k);
+<a name='L2605'></a>        map[k] = theNode.<span class="keyword">clone</span>();
+<a name='L2606'></a>        theNode.replaceWith(v);
+<a name='L2607'></a>    });
+<a name='L2608'></a>
+<a name='L2609'></a>    <span class="comment">// Add back the deleted trees before removing the new trees, just in case</span>
+<a name='L2610'></a>    <span class="comment">// the insertion point of one of these is going to get zapped.  This</span>
+<a name='L2611'></a>    <span class="comment">// shouldn't happen, though.</span>
+<a name='L2612'></a>    _.each(undoData.delTr, <span class="keyword">function</span>(v) {
+<a name='L2613'></a>        <span class="keyword">var</span> prev = v.before;
+<a name='L2614'></a>        <span class="keyword">if</span> (prev) {
+<a name='L2615'></a>            v.tree.insertAfter($(<span class="string">"#"</span> + prev));
+<a name='L2616'></a>        } <span class="keyword">else</span> {
+<a name='L2617'></a>            v.tree.prependTo($(<span class="string">"#sn0"</span>));
+<a name='L2618'></a>        }
+<a name='L2619'></a>        newTr.push(v.tree.attr(<span class="string">"id"</span>));
+<a name='L2620'></a>    });
+<a name='L2621'></a>
+<a name='L2622'></a>    _.each(undoData.newTr, <span class="keyword">function</span>(v) {
+<a name='L2623'></a>        <span class="keyword">var</span> theNode = $(<span class="string">"#"</span> + v);
+<a name='L2624'></a>        <span class="keyword">var</span> prev = theNode.prev();
+<a name='L2625'></a>        <span class="keyword">if</span> (prev.length === <span class="number">0</span>) {
+<a name='L2626'></a>            prev = <span class="keyword">null</span>;
+<a name='L2627'></a>        }
+<a name='L2628'></a>        delTr.push({
+<a name='L2629'></a>            tree: theNode.<span class="keyword">clone</span>(),
+<a name='L2630'></a>            before: prev &amp;&amp; prev.attr(<span class="string">"id"</span>)
+<a name='L2631'></a>        });
+<a name='L2632'></a>        theNode.remove();
+<a name='L2633'></a>    });
+<a name='L2634'></a>
+<a name='L2635'></a>    <span class="keyword">return</span> {
+<a name='L2636'></a>        map: map,
+<a name='L2637'></a>        newTr: newTr,
+<a name='L2638'></a>        delTr: delTr
+<a name='L2639'></a>    };
+<a name='L2640'></a>}
+<a name='L2641'></a>
+<a name='L2642'></a><span class="comment">/**
+<a name='L2643'></a> * Perform undo.
+<a name='L2644'></a> */</span>
+<a name='L2645'></a><span class="keyword">function</span> undo() {
+<a name='L2646'></a>    <span class="keyword">if</span> (undoStack.length === <span class="number">0</span>) {
+<a name='L2647'></a>        displayWarning(<span class="string">"No further undo information"</span>);
+<a name='L2648'></a>        <span class="keyword">return</span>;
+<a name='L2649'></a>    }
+<a name='L2650'></a>    <span class="keyword">var</span> lastUndo = undoStack.pop();
+<a name='L2651'></a>    redoStack.push(doUndo(lastUndo));
+<a name='L2652'></a>    startnode = endnode = undefined;
+<a name='L2653'></a>    updateSelection();
+<a name='L2654'></a>}
+<a name='L2655'></a>
+<a name='L2656'></a><span class="comment">/**
+<a name='L2657'></a> * Perform redo.
+<a name='L2658'></a> */</span>
+<a name='L2659'></a><span class="keyword">function</span> redo () {
+<a name='L2660'></a>    <span class="keyword">if</span> (redoStack.length === <span class="number">0</span>) {
+<a name='L2661'></a>        displayWarning(<span class="string">"No further redo information"</span>);
+<a name='L2662'></a>        <span class="keyword">return</span>;
+<a name='L2663'></a>    }
+<a name='L2664'></a>    undoStack.push(doUndo(redoStack.pop()));
+<a name='L2665'></a>    startnode = endnode = undefined;
+<a name='L2666'></a>    updateSelection();
+<a name='L2667'></a>}
+<a name='L2668'></a>
+<a name='L2669'></a><span class="comment">// ===== Misc</span>
+<a name='L2670'></a>
+<a name='L2671'></a><span class="comment">/**
+<a name='L2672'></a> * Toggle display of lemmata.
+<a name='L2673'></a> */</span>
+<a name='L2674'></a><span class="keyword">function</span> toggleLemmata() {
+<a name='L2675'></a>    <span class="keyword">if</span> (lemmataHidden) {
+<a name='L2676'></a>        lemmataStyleNode.innerHTML = <span class="string">""</span>;
+<a name='L2677'></a>    } <span class="keyword">else</span> {
+<a name='L2678'></a>        lemmataStyleNode.innerHTML = <span class="string">".lemma { display: none; }"</span>;
+<a name='L2679'></a>    }
+<a name='L2680'></a>    lemmataHidden = !lemmataHidden;
+<a name='L2681'></a>}
+<a name='L2682'></a>
+<a name='L2683'></a><span class="keyword">function</span> fixError() {
+<a name='L2684'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
+<a name='L2685'></a>    <span class="keyword">var</span> sn = $(startnode);
+<a name='L2686'></a>    <span class="keyword">if</span> (hasDashTag(sn, <span class="string">"FLAG"</span>)) {
+<a name='L2687'></a>        toggleExtension(<span class="string">"FLAG"</span>, [<span class="string">"FLAG"</span>]);
+<a name='L2688'></a>    }
+<a name='L2689'></a>    updateSelection();
+<a name='L2690'></a>}
+<a name='L2691'></a>
+<a name='L2692'></a><span class="keyword">function</span> zeroDashTags() {
+<a name='L2693'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
+<a name='L2694'></a>    <span class="keyword">var</span> label = getLabel($(startnode));
+<a name='L2695'></a>    <span class="keyword">var</span> idx = parseIndex(label),
+<a name='L2696'></a>        idxType = parseIndexType(label),
+<a name='L2697'></a>        lab = parseLabel(label);
+<a name='L2698'></a>    <span class="keyword">if</span> (idx == -<span class="number">1</span>) {
+<a name='L2699'></a>        idx = idxType = <span class="string">""</span>;
+<a name='L2700'></a>    }
+<a name='L2701'></a>    touchTree($(startnode));
+<a name='L2702'></a>    setLabelLL($(startnode), lab.split(<span class="string">"-"</span>)[<span class="number">0</span>] + idxType + idx);
+<a name='L2703'></a>}
+<a name='L2704'></a>
+<a name='L2705'></a><span class="comment">// TODO: should allow numeric indices; document</span>
+<a name='L2706'></a><span class="keyword">function</span> basesAndDashes(bases, dashes) {
+<a name='L2707'></a>    <span class="keyword">function</span> _basesAndDashes(string) {
+<a name='L2708'></a>        <span class="keyword">var</span> spl = string.split(<span class="string">"-"</span>);
+<a name='L2709'></a>        <span class="keyword">var</span> b = spl.shift();
+<a name='L2710'></a>        <span class="keyword">return</span> (bases.indexOf(b) > -<span class="number">1</span>) &amp;&amp;
+<a name='L2711'></a>            _.all(spl, <span class="keyword">function</span> (x) { <span class="keyword">return</span> (dashes.indexOf(x) > -<span class="number">1</span>); });
+<a name='L2712'></a>    }
+<a name='L2713'></a>    <span class="keyword">return</span> _basesAndDashes;
+<a name='L2714'></a>}
+<a name='L2715'></a>
+<a name='L2716'></a><span class="keyword">function</span> addLemma(lemma) {
+<a name='L2717'></a>    <span class="comment">// TODO: This only makes sense for dash-format corpora</span>
+<a name='L2718'></a>    <span class="keyword">if</span> (!startnode || endnode) <span class="keyword">return</span>;
+<a name='L2719'></a>    <span class="keyword">if</span> (!isLeafNode($(startnode)) || isEmpty(wnodeString($(startnode)))) <span class="keyword">return</span>;
+<a name='L2720'></a>    touchTree($(startnode));
+<a name='L2721'></a>    <span class="keyword">var</span> theLemma = $(<span class="string">"&lt;span class='lemma'>-"</span> + lemma +
+<a name='L2722'></a>                     <span class="string">"&lt;/span>"</span>);
+<a name='L2723'></a>    $(startnode).children(<span class="string">".wnode"</span>).append(theLemma);
+<a name='L2724'></a>}
+<a name='L2725'></a>
+<a name='L2726'></a><span class="keyword">function</span> untilSuccess() {
+<a name='L2727'></a>    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; arguments.length; i++) {
+<a name='L2728'></a>        <span class="keyword">var</span> fn = arguments[i][<span class="number">0</span>],
+<a name='L2729'></a>            args = arguments[i].slice(<span class="number">1</span>);
+<a name='L2730'></a>        <span class="keyword">var</span> res = fn.apply(<span class="keyword">null</span>, args);
+<a name='L2731'></a>        <span class="keyword">if</span> (res) {
+<a name='L2732'></a>            <span class="keyword">return</span>;
+<a name='L2733'></a>        }
+<a name='L2734'></a>    }
+<a name='L2735'></a>}
+<a name='L2736'></a>
+<a name='L2737'></a><span class="keyword">function</span> leafOrNot(leaf, not) {
+<a name='L2738'></a>    <span class="keyword">var</span> fn, args;
+<a name='L2739'></a>    <span class="keyword">if</span> (guessLeafNode($(startnode))) {
+<a name='L2740'></a>        fn = arguments[<span class="number">0</span>][<span class="number">0</span>];
+<a name='L2741'></a>        args = arguments[<span class="number">0</span>].slice(<span class="number">1</span>);
+<a name='L2742'></a>    } <span class="keyword">else</span> {
+<a name='L2743'></a>        fn = arguments[<span class="number">1</span>][<span class="number">0</span>];
+<a name='L2744'></a>        args = arguments[<span class="number">1</span>].slice(<span class="number">1</span>);
+<a name='L2745'></a>    }
+<a name='L2746'></a>    fn.apply(<span class="keyword">null</span>, args);
+<a name='L2747'></a>}
+<a name='L2748'></a>
+<a name='L2749'></a><span class="comment">// ===== Misc (candidates to move to utils)</span>
+<a name='L2750'></a>
+<a name='L2751'></a><span class="comment">// TODO: move to utils?</span>
+<a name='L2752'></a><span class="keyword">function</span> setLeafLabel(node, label) {
+<a name='L2753'></a>    <span class="keyword">if</span> (!node.hasClass(<span class="string">".wnode"</span>)) {
+<a name='L2754'></a>        <span class="comment">// why do we do this?  We should be less fault-tolerant.</span>
+<a name='L2755'></a>        node = node.children(<span class="string">".wnode"</span>).first();
+<a name='L2756'></a>    }
+<a name='L2757'></a>    textNode(node).replaceWith($.trim(label));
+<a name='L2758'></a>}
+<a name='L2759'></a><span class="comment">// TODO: need a setLemma function as well</span>
+<a name='L2760'></a>
+<a name='L2761'></a><span class="comment">// TODO: only called from one place, with indices: possibly specialize name?</span>
+<a name='L2762'></a><span class="keyword">function</span> appendExtension(node, extension, type) {
+<a name='L2763'></a>    <span class="keyword">if</span> (!type) {
+<a name='L2764'></a>        type=<span class="string">"-"</span>;
+<a name='L2765'></a>    }
+<a name='L2766'></a>    <span class="keyword">if</span> (shouldIndexLeaf(node) &amp;&amp; !isNaN(extension)) {
+<a name='L2767'></a>        <span class="comment">// Adding an index to an empty category, and the EC is not an</span>
+<a name='L2768'></a>        <span class="comment">// empty operator.  The final proviso is needed because of</span>
+<a name='L2769'></a>        <span class="comment">// things like the empty WADJP in comparatives.</span>
+<a name='L2770'></a>        <span class="keyword">var</span> oldLabel = textNode(node.children(<span class="string">".wnode"</span>).first()).text();
+<a name='L2771'></a>        setLeafLabel(node, oldLabel + type + extension);
+<a name='L2772'></a>    } <span class="keyword">else</span> {
+<a name='L2773'></a>        setNodeLabel(node, getLabel(node) + type + extension, <span class="keyword">true</span>);
+<a name='L2774'></a>    }
+<a name='L2775'></a>}
+<a name='L2776'></a>
+<a name='L2777'></a><span class="keyword">function</span> removeIndex(node) {
+<a name='L2778'></a>    node = $(node);
+<a name='L2779'></a>    <span class="keyword">if</span> (getIndex(node) == -<span class="number">1</span>) {
+<a name='L2780'></a>        <span class="keyword">return</span>;
+<a name='L2781'></a>    }
+<a name='L2782'></a>    <span class="keyword">var</span> label, setLabelFn;
+<a name='L2783'></a>    <span class="keyword">if</span> (shouldIndexLeaf(node)) {
+<a name='L2784'></a>        label = wnodeString(node);
+<a name='L2785'></a>        setLabelFn = setLeafLabel;
+<a name='L2786'></a>    } <span class="keyword">else</span> {
+<a name='L2787'></a>        label = getLabel(node);
+<a name='L2788'></a>        setLabelFn = setNodeLabel;
+<a name='L2789'></a>    }
+<a name='L2790'></a>    setLabelFn(node,
+<a name='L2791'></a>               label.substr(<span class="number">0</span>, Math.max(label.lastIndexOf(<span class="string">"-"</span>),
+<a name='L2792'></a>                                        label.lastIndexOf(<span class="string">"="</span>))),
+<a name='L2793'></a>               <span class="keyword">true</span>);
+<a name='L2794'></a>}
+<a name='L2795'></a>
+<a name='L2796'></a><span class="comment">// A low-level (LL) version of setLabel.  It is only responsible for changing</span>
+<a name='L2797'></a><span class="comment">// the label; not doing any kind of matching/changing/other crap.</span>
+<a name='L2798'></a><span class="keyword">function</span> setLabelLL(node, label) {
+<a name='L2799'></a>    <span class="keyword">if</span> (node.hasClass(<span class="string">"snode"</span>)) {
+<a name='L2800'></a>        <span class="keyword">if</span> (label[label.length - <span class="number">1</span>] != <span class="string">" "</span>) {
+<a name='L2801'></a>            <span class="comment">// Some other spots in the code depend on the label ending with a</span>
+<a name='L2802'></a>            <span class="comment">// space...</span>
+<a name='L2803'></a>            label += <span class="string">" "</span>;
+<a name='L2804'></a>        }
+<a name='L2805'></a>    } <span class="keyword">else</span> <span class="keyword">if</span> (node.hasClass(<span class="string">"wnode"</span>)) {
+<a name='L2806'></a>        <span class="comment">// Words cannot have a trailing space, or CS barfs on save.</span>
+<a name='L2807'></a>        label = $.trim(label);
+<a name='L2808'></a>    } <span class="keyword">else</span> {
+<a name='L2809'></a>        <span class="comment">// should never happen</span>
+<a name='L2810'></a>        <span class="keyword">return</span>;
+<a name='L2811'></a>    }
+<a name='L2812'></a>    <span class="keyword">var</span> oldLabel = parseLabel(getLabel(node));
+<a name='L2813'></a>    textNode(node).replaceWith(label);
+<a name='L2814'></a>    updateCssClass(node, oldLabel);
+<a name='L2815'></a>}
+<a name='L2816'></a>
+<a name='L2817'></a><span class="comment">/**
+<a name='L2818'></a> * Update the CSS class of a node to reflect its label.
+<a name='L2819'></a> *
+<a name='L2820'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node
+<a name='L2821'></a> *<span class="phpdoc"> @param</span> {String} oldlabel (optional) the former label of this node
+<a name='L2822'></a> */</span>
+<a name='L2823'></a><span class="keyword">function</span> updateCssClass(node, oldlabel) {
+<a name='L2824'></a>    <span class="keyword">if</span> (!node.hasClass(<span class="string">"snode"</span>)) {
+<a name='L2825'></a>        <span class="keyword">return</span>;
+<a name='L2826'></a>    }
+<a name='L2827'></a>    <span class="keyword">if</span> (oldlabel) {
+<a name='L2828'></a>        <span class="comment">// should never be needed, but a bit of defensiveness can't hurt</span>
+<a name='L2829'></a>        oldlabel = parseLabel($.trim(oldlabel));
+<a name='L2830'></a>    } <span class="keyword">else</span> {
+<a name='L2831'></a>        <span class="comment">// oldlabel wasn't supplied -- try to guess</span>
+<a name='L2832'></a>        oldlabel = node.attr(<span class="string">"class"</span>).split(<span class="string">" "</span>);
+<a name='L2833'></a>        oldlabel = _.find(oldlabel, <span class="keyword">function</span> (s) { <span class="keyword">return</span> (/[A-Z-]/).match(s); });
+<a name='L2834'></a>    }
+<a name='L2835'></a>    node.removeClass(oldlabel);
+<a name='L2836'></a>    node.addClass(parseLabel(getLabel(node)));
+<a name='L2837'></a>}
+<a name='L2838'></a>
+<a name='L2839'></a><span class="comment">//================================================== Obsolete/other</span>
+<a name='L2840'></a>
+<a name='L2841'></a><span class="comment">/**
+<a name='L2842'></a> * Sets the label of a node
+<a name='L2843'></a> *
+<a name='L2844'></a> * Contains none of the heuristics of {@link setLabel}.
+<a name='L2845'></a> *
+<a name='L2846'></a> *<span class="phpdoc"> @param</span> {JQuery Node} node the target node
+<a name='L2847'></a> *<span class="phpdoc"> @param</span> {String} label the new label
+<a name='L2848'></a> *<span class="phpdoc"> @param</span> {Boolean} noUndo whether to record this operation for later undo
+<a name='L2849'></a> */</span>
+<a name='L2850'></a><span class="keyword">function</span> setNodeLabel(node, label, noUndo) {
+<a name='L2851'></a>    <span class="comment">// TODO: fold this and setLabelLL together...</span>
+<a name='L2852'></a>    setLabelLL(node, label);
+<a name='L2853'></a>}
+<a name='L2854'></a>
+<a name='L2855'></a><span class="comment">// TODO(AWE): I think that updating labels on changing nodes works, but</span>
+<a name='L2856'></a><span class="comment">// this fn should be interactively called with debugging arg to test this</span>
+<a name='L2857'></a><span class="comment">// supposition.  When I am confident of the behavior of the code, this fn will</span>
+<a name='L2858'></a><span class="comment">// be removed.</span>
+<a name='L2859'></a><span class="keyword">function</span> resetLabelClasses(alertOnError) {
+<a name='L2860'></a>    <span class="keyword">var</span> nodes = $(<span class="string">".snode"</span>).each(
+<a name='L2861'></a>        <span class="keyword">function</span>() {
+<a name='L2862'></a>            <span class="keyword">var</span> node = $(<span class="keyword">this</span>);
+<a name='L2863'></a>            <span class="keyword">var</span> label = $.trim(getLabel(node));
+<a name='L2864'></a>            <span class="keyword">if</span> (alertOnError) {
+<a name='L2865'></a>                <span class="keyword">var</span> classes = node.attr(<span class="string">"class"</span>).split(<span class="string">" "</span>);
+<a name='L2866'></a>                <span class="comment">// This incantation removes a value from an array.</span>
+<a name='L2867'></a>                classes.indexOf(<span class="string">"snode"</span>) >= <span class="number">0</span> &amp;&amp;
+<a name='L2868'></a>                    classes.splice(classes.indexOf(<span class="string">"snode"</span>), <span class="number">1</span>);
+<a name='L2869'></a>                classes.indexOf(label) >= <span class="number">0</span> &amp;&amp;
+<a name='L2870'></a>                    classes.splice(classes.indexOf(label), <span class="number">1</span>);
+<a name='L2871'></a>                <span class="keyword">if</span> (classes.length > <span class="number">0</span>) {
+<a name='L2872'></a>                    alert(<span class="string">"Spurious classes '"</span> + classes.join() +
+<a name='L2873'></a>                          <span class="string">"' detected on node id'"</span> + node.attr(<span class="string">"id"</span>) + <span class="string">"'"</span>);
+<a name='L2874'></a>                }
+<a name='L2875'></a>            }
+<a name='L2876'></a>        node.attr(<span class="string">"class"</span>, <span class="string">"snode "</span> + label);
+<a name='L2877'></a>        });
+<a name='L2878'></a>}
+<a name='L2879'></a>
+<a name='L2880'></a>
+<a name='L2881'></a><span class="comment">// TODO: badly need a DSL for forms</span>
+<a name='L2882'></a>
+<a name='L2883'></a><span class="comment">// Local Variables:</span>
+<a name='L2884'></a><span class="comment">// js2-additional-externs: ("$" "setTimeout" "customCommands\</span>
+<a name='L2885'></a><span class="comment">// " "customConLeafBefore" "customConMenuGroups" "extensions" "leaf_extensions\</span>
+<a name='L2886'></a><span class="comment">// " "clause_extensions" "JSON" "testValidLeafLabel" "testValidPhraseLabel\</span>
+<a name='L2887'></a><span class="comment">// " "_" "startTime" "console" "loadContextMenu" "safeGet\</span>
+<a name='L2888'></a><span class="comment">// " "jsonToTree" "objectToTree" "dictionaryToForm" "formToDictionary\</span>
+<a name='L2889'></a><span class="comment">// " "displayWarning" "displayInfo" "displayError" "isEmpty" "isPossibleTarget\</span>
+<a name='L2890'></a><span class="comment">// " "isRootNode" "isLeafNode" "guessLeafNode" "getTokenRoot" "wnodeString\</span>
+<a name='L2891'></a><span class="comment">// " "currentText" "getLabel" "textNode" "getMetadata" "hasDashTag\</span>
+<a name='L2892'></a><span class="comment">// " "parseIndex" "parseLabel" "parseIndexType" "getIndex" "getIndexType\</span>
+<a name='L2893'></a><span class="comment">// " "shouldIndexLeaf" "maxIndex" "addToIndices" "changeJustLabel\</span>
+<a name='L2894'></a><span class="comment">// " "toggleStringExtension" "lookupNextLabel" "commentTypes\</span>
+<a name='L2895'></a><span class="comment">// " "invisibleCategories" "invisibleRootCategories" "ipnodes" "messageHistory\</span>
+<a name='L2896'></a><span class="comment">// " "scrollToNext" "clearTimeout" "logDetail" "hasLemma" "getLemma\</span>
+<a name='L2897'></a><span class="comment">// " "logDetail")</span>
+<a name='L2898'></a><span class="comment">// indent-tabs-mode: nil</span>
+<a name='L2899'></a><span class="comment">// End:</span>
+<a name='L2900'></a>
 </code>
   </pre>
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Thu Oct 04 2012 14:45:30 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Sun Sep 15 2013 16:38:44 GMT-0400 (EDT)
 </footer>
 
 </body>
