@@ -2312,7 +2312,7 @@ has case.</p>
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L589">treedrawing.utils.js, line 589</a></li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L605">treedrawing.utils.js, line 605</a></li></ul></dd>
 	
     
     
@@ -2653,6 +2653,256 @@ has case.</p>
         
             
 <dt>
+    <h4 class="name" id="isCaseLabel"><span class="type-signature"></span>isCaseLabel</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Test whether a label can bear case.</p>
+
+<p>Respects the <code>caseTags</code> configuration variable.</p>
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                        String
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L643">treedrawing.utils.js, line 643</a></li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">Boolean</span> 
+		
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isCaseNode"><span class="type-signature"></span>isCaseNode</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Test whether a node can bear case.</p>
+
+<p>See <code>isCaseLabel</code>.</p>
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+            
+            <td class="type">
+            
+                        JQuery Node
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L656">treedrawing.utils.js, line 656</a></li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">Boolean</span> 
+		
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="isCasePhrase"><span class="type-signature"></span>isCasePhrase</h4>
     
     
@@ -2737,7 +2987,7 @@ has case.</p>
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L613">treedrawing.utils.js, line 613</a></li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L631">treedrawing.utils.js, line 631</a></li></ul></dd>
 	
     
     
@@ -3192,6 +3442,388 @@ category.</p>
     
     
     
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="labelGetCase"><span class="type-signature"></span>labelGetCase</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Find the case associated with a label.</p>
+
+<p>This function respects the case-related variable <code>caseMarkers</code>.</p>
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                        String
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L579">treedrawing.utils.js, line 579</a></li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>the case on the label, or <code>""</code> if none.</p>
+</div>
+
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">String</span> 
+		
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="labelHasCase"><span class="type-signature"></span>labelHasCase</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Test if a label has case.</p>
+
+<p>This function tests whether a label is in <code>caseTags</code>, and then whether it
+has case.</p>
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                        String
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L619">treedrawing.utils.js, line 619</a></li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">Boolean</span> 
+		
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="labelRemoveCase"><span class="type-signature"></span>labelRemoveCase</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Remove the case from a string label.</p>
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>label</code></td>
+            
+            
+            <td class="type">
+            
+                        String
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L666">treedrawing.utils.js, line 666</a></li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>the label without case</p>
+</div>
+
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">String</span> 
+		
+	</dd>
+</dl>
+
+        
     
     
 </dd>
@@ -4486,7 +5118,7 @@ directly dominates no non-empty terminals.</p>
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L624">treedrawing.utils.js, line 624</a></li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L681">treedrawing.utils.js, line 681</a></li></ul></dd>
 	
     
     
@@ -4980,7 +5612,7 @@ selection, even if it wouldn't otherwise be.</p></td>
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L640">treedrawing.utils.js, line 640</a></li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li><a href="src/treedrawing.utils.js.html#L696">treedrawing.utils.js, line 696</a></li></ul></dd>
 	
     
     
@@ -6774,7 +7406,7 @@ appropriate ordered list of possible extensions.</p></td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Global</h3><ul><li><a href="global.html#addCommand">addCommand</a></li><li><a href="global.html#addConLeafBefore">addConLeafBefore</a></li><li><a href="global.html#addConMenuGroup">addConMenuGroup</a></li><li><a href="global.html#clearSearchMatches">clearSearchMatches</a></li><li><a href="global.html#clearSelection">clearSelection</a></li><li><a href="global.html#coIndex">coIndex</a></li><li><a href="global.html#currentText">currentText</a></li><li><a href="global.html#displayError">displayError</a></li><li><a href="global.html#displayInfo">displayInfo</a></li><li><a href="global.html#displayRename">displayRename</a></li><li><a href="global.html#displayWarning">displayWarning</a></li><li><a href="global.html#editLemma">editLemma</a></li><li><a href="global.html#editNode">editNode</a></li><li><a href="global.html#endnode">endnode</a></li><li><a href="global.html#flagSearchMatch">flagSearchMatch</a></li><li><a href="global.html#getCase">getCase</a></li><li><a href="global.html#getIndex">getIndex</a></li><li><a href="global.html#getIndexType">getIndexType</a></li><li><a href="global.html#getLabel">getLabel</a></li><li><a href="global.html#getLemma">getLemma</a></li><li><a href="global.html#getTokenRoot">getTokenRoot</a></li><li><a href="global.html#guessLeafNode">guessLeafNode</a></li><li><a href="global.html#hasCase">hasCase</a></li><li><a href="global.html#hasDashTag">hasDashTag</a></li><li><a href="global.html#hideDialogBox">hideDialogBox</a></li><li><a href="global.html#ignoringUndo">ignoringUndo</a></li><li><a href="global.html#isCasePhrase">isCasePhrase</a></li><li><a href="global.html#isEmpty">isEmpty</a></li><li><a href="global.html#isLeafNode">isLeafNode</a></li><li><a href="global.html#isPossibleTarget">isPossibleTarget</a></li><li><a href="global.html#isRootNode">isRootNode</a></li><li><a href="global.html#leafAfter">leafAfter</a></li><li><a href="global.html#leafBefore">leafBefore</a></li><li><a href="global.html#makeLeaf">makeLeaf</a></li><li><a href="global.html#makeNode">makeNode</a></li><li><a href="global.html#maxIndex">maxIndex</a></li><li><a href="global.html#moveNode">moveNode</a></li><li><a href="global.html#moveNodes">moveNodes</a></li><li><a href="global.html#nextSearchMatch">nextSearchMatch</a></li><li><a href="global.html#nukeUndo">nukeUndo</a></li><li><a href="global.html#pruneNode">pruneNode</a></li><li><a href="global.html#redo">redo</a></li><li><a href="global.html#registerDeletedRootTree">registerDeletedRootTree</a></li><li><a href="global.html#registerNewRootTree">registerNewRootTree</a></li><li><a href="global.html#removeCase">removeCase</a></li><li><a href="global.html#scrollToNext">scrollToNext</a></li><li><a href="global.html#scrollToShowSel">scrollToShowSel</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchNodePostAdd">searchNodePostAdd</a></li><li><a href="global.html#selectNode">selectNode</a></li><li><a href="global.html#setCase">setCase</a></li><li><a href="global.html#setLabel">setLabel</a></li><li><a href="global.html#setNodeLabel">setNodeLabel</a></li><li><a href="global.html#shouldIndexLeaf">shouldIndexLeaf</a></li><li><a href="global.html#showDialogBox">showDialogBox</a></li><li><a href="global.html#showMessageHistory">showMessageHistory</a></li><li><a href="global.html#startnode">startnode</a></li><li><a href="global.html#styleDashTag">styleDashTag</a></li><li><a href="global.html#styleTag">styleTag</a></li><li><a href="global.html#styleTags">styleTags</a></li><li><a href="global.html#toggleExtension">toggleExtension</a></li><li><a href="global.html#toggleLemmata">toggleLemmata</a></li><li><a href="global.html#touchTree">touchTree</a></li><li><a href="global.html#undo">undo</a></li><li><a href="global.html#undoAbortTransaction">undoAbortTransaction</a></li><li><a href="global.html#undoBeginTransaction">undoBeginTransaction</a></li><li><a href="global.html#undoEndTransaction">undoEndTransaction</a></li><li><a href="global.html#updateCssClass">updateCssClass</a></li><li><a href="global.html#wnodeString">wnodeString</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Global</h3><ul><li><a href="global.html#addCommand">addCommand</a></li><li><a href="global.html#addConLeafBefore">addConLeafBefore</a></li><li><a href="global.html#addConMenuGroup">addConMenuGroup</a></li><li><a href="global.html#clearSearchMatches">clearSearchMatches</a></li><li><a href="global.html#clearSelection">clearSelection</a></li><li><a href="global.html#coIndex">coIndex</a></li><li><a href="global.html#currentText">currentText</a></li><li><a href="global.html#displayError">displayError</a></li><li><a href="global.html#displayInfo">displayInfo</a></li><li><a href="global.html#displayRename">displayRename</a></li><li><a href="global.html#displayWarning">displayWarning</a></li><li><a href="global.html#editLemma">editLemma</a></li><li><a href="global.html#editNode">editNode</a></li><li><a href="global.html#endnode">endnode</a></li><li><a href="global.html#flagSearchMatch">flagSearchMatch</a></li><li><a href="global.html#getCase">getCase</a></li><li><a href="global.html#getIndex">getIndex</a></li><li><a href="global.html#getIndexType">getIndexType</a></li><li><a href="global.html#getLabel">getLabel</a></li><li><a href="global.html#getLemma">getLemma</a></li><li><a href="global.html#getTokenRoot">getTokenRoot</a></li><li><a href="global.html#guessLeafNode">guessLeafNode</a></li><li><a href="global.html#hasCase">hasCase</a></li><li><a href="global.html#hasDashTag">hasDashTag</a></li><li><a href="global.html#hideDialogBox">hideDialogBox</a></li><li><a href="global.html#ignoringUndo">ignoringUndo</a></li><li><a href="global.html#isCaseLabel">isCaseLabel</a></li><li><a href="global.html#isCaseNode">isCaseNode</a></li><li><a href="global.html#isCasePhrase">isCasePhrase</a></li><li><a href="global.html#isEmpty">isEmpty</a></li><li><a href="global.html#isLeafNode">isLeafNode</a></li><li><a href="global.html#isPossibleTarget">isPossibleTarget</a></li><li><a href="global.html#isRootNode">isRootNode</a></li><li><a href="global.html#labelGetCase">labelGetCase</a></li><li><a href="global.html#labelHasCase">labelHasCase</a></li><li><a href="global.html#labelRemoveCase">labelRemoveCase</a></li><li><a href="global.html#leafAfter">leafAfter</a></li><li><a href="global.html#leafBefore">leafBefore</a></li><li><a href="global.html#makeLeaf">makeLeaf</a></li><li><a href="global.html#makeNode">makeNode</a></li><li><a href="global.html#maxIndex">maxIndex</a></li><li><a href="global.html#moveNode">moveNode</a></li><li><a href="global.html#moveNodes">moveNodes</a></li><li><a href="global.html#nextSearchMatch">nextSearchMatch</a></li><li><a href="global.html#nukeUndo">nukeUndo</a></li><li><a href="global.html#pruneNode">pruneNode</a></li><li><a href="global.html#redo">redo</a></li><li><a href="global.html#registerDeletedRootTree">registerDeletedRootTree</a></li><li><a href="global.html#registerNewRootTree">registerNewRootTree</a></li><li><a href="global.html#removeCase">removeCase</a></li><li><a href="global.html#scrollToNext">scrollToNext</a></li><li><a href="global.html#scrollToShowSel">scrollToShowSel</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchNodePostAdd">searchNodePostAdd</a></li><li><a href="global.html#selectNode">selectNode</a></li><li><a href="global.html#setCase">setCase</a></li><li><a href="global.html#setLabel">setLabel</a></li><li><a href="global.html#setNodeLabel">setNodeLabel</a></li><li><a href="global.html#shouldIndexLeaf">shouldIndexLeaf</a></li><li><a href="global.html#showDialogBox">showDialogBox</a></li><li><a href="global.html#showMessageHistory">showMessageHistory</a></li><li><a href="global.html#startnode">startnode</a></li><li><a href="global.html#styleDashTag">styleDashTag</a></li><li><a href="global.html#styleTag">styleTag</a></li><li><a href="global.html#styleTags">styleTags</a></li><li><a href="global.html#toggleExtension">toggleExtension</a></li><li><a href="global.html#toggleLemmata">toggleLemmata</a></li><li><a href="global.html#touchTree">touchTree</a></li><li><a href="global.html#undo">undo</a></li><li><a href="global.html#undoAbortTransaction">undoAbortTransaction</a></li><li><a href="global.html#undoBeginTransaction">undoBeginTransaction</a></li><li><a href="global.html#undoEndTransaction">undoEndTransaction</a></li><li><a href="global.html#updateCssClass">updateCssClass</a></li><li><a href="global.html#wnodeString">wnodeString</a></li></ul>
 </nav>
 
 <br clear="both">
@@ -6782,7 +7414,7 @@ appropriate ordered list of possible extensions.</p></td>
 <footer>
     Documentation generated
     by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on
-    Tue Sep 17 2013 16:35:03 GMT-0400 (EDT).  <a href="copyright.html">Copyright information</a>
+    Thu Sep 19 2013 14:53:19 GMT-0400 (EDT).  <a href="copyright.html">Copyright information</a>
 </footer>
 
 </body>
