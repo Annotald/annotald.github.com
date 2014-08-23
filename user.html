@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Annotald User’s Guide</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><link rel="stylesheet" type="text/css" href="annotald-manual.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idm140264444519056"></a>Annotald User’s Guide</h2></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Aaron</span> <span class="surname">Ecay</span></h3><code class="email">&lt;<a class="email" href="mailto:ecay@babel.ling.upenn.edu">ecay@babel.ling.upenn.edu</a>&gt;</code></div></div></div><div><p class="copyright">Copyright © 2012 Aaron Ecay</p></div><div><div class="legalnotice"><a id="idm140264446201312"></a><p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Annotald User’s Guide</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><link rel="stylesheet" type="text/css" href="annotald-manual.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idm140132058004848"></a>Annotald User’s Guide</h2></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Aaron</span> <span class="surname">Ecay</span></h3><code class="email">&lt;<a class="email" href="mailto:ecay@babel.ling.upenn.edu">ecay@babel.ling.upenn.edu</a>&gt;</code></div></div></div><div><p class="copyright">Copyright © 2012 Aaron Ecay</p></div><div><div class="legalnotice"><a id="idm140132057264304"></a><p>
     This work is licensed under a Creative Commons
     Attribution-NonCommercial-NoDerivs 3.0 Unported License
     http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US
@@ -21,7 +21,7 @@ Research funds at the University of Pennsylvania
 mailing list to receive announcements of new releases, please contact
 <a class="ulink" href="mailto:ecay@sas.upenn.edu" target="_top">Aaron Ecay</a></p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_installation"></a>2. Installation</h2></div></div></div><p>In order to use Annotald, it is necessary to install several programs
 that Annotald depends on in order to function.  Like Annotald itself,
-all of these programs are Free Software.<a href="#ftn.idm140264441337584" class="footnote" id="idm140264441337584"><sup class="footnote">[1]</sup></a></p><p>Some of Annotald’s dependencies may require a C compiler; for Macs this is
+all of these programs are Free Software.<a href="#ftn.idm140132056589040" class="footnote" id="idm140132056589040"><sup class="footnote">[1]</sup></a></p><p>Some of Annotald’s dependencies may require a C compiler; for Macs this is
 available by installing Apple’s no-cost XCode toolkit, and then choosing
 to download the “Command Line Tools” from the “Downloads” preference pane
 within the XCode application.  These are the instructions to install
@@ -71,7 +71,16 @@ in the Penn treebank format; if a sample file is needed you can use
 file from the IcePaHC project</a>).  Then, open the Chrome browser, and
 navigate to <a class="ulink" href="http://localhost:8080" target="_top">http://localhost:8080</a>.  You should see the Annotald
 interface appear.  The rest of this manual is concerned with using and
-customizing the program.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/icons/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>If you are not able to install Annotald successfully, you can open
+customizing the program.</p><div class="caution" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Caution"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="images/icons/caution.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>A bug in the CherryPy webserver package has emerged recently
+which will cause new installations of Annotald to fail to start with an
+error message saying <code class="literal">No module named wsgiserver2</code>.  If this occurs,
+execute the following commands in your shell:</p></td></tr></table></div><p>+</p><pre class="screen">pip uninstall Cherrypy
+pip install --no-use-wheel CherryPy</pre><p>+
+Prepend <code class="literal">sudo</code> to the commands or add the <code class="literal">--user</code> flag after
+<code class="literal">(un)install</code> as appropriate, depending on which method you used to
+install Annotald originally.  Details about this bug are available
+<a class="ulink" href="https://bitbucket.org/cherrypy/cherrypy/issue/1295/325-wheel-does-not-include-wsgiserver2py" target="_top">from
+the CherryPy project</a>.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/icons/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>If you are not able to install Annotald successfully, you can open
 an issue report at <a class="ulink" href="https://github.com/Annotald/annotald" target="_top">Annotald’s
 website</a> on GitHub.  This will put you in touch with Annotald’s
 developers, who will help you solve the problem.  When creating issue
@@ -109,7 +118,7 @@ you do not trust the other users on the SSH server, you should not be
 running Annotald on it.  Accidents are also a danger.  Be careful that
 you do not inadvertently connect to someone else’s instance of Annotald!
 You may inadvertently save over their work.</p></td></tr></table></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_annotald_ui_and_philosophy"></a>3. Annotald UI and Philosophy</h2></div></div></div><p>The Annotald user interface (UI) is shown in the following
-screenshot:<a href="#ftn.idm140264441316944" class="footnote" id="idm140264441316944"><sup class="footnote">[2]</sup></a></p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-hello.png" align="middle" alt="The Annotald UI at startup" /></div></div><p>On the left-hand side of the screen, the following are present, from top
+screenshot:<a href="#ftn.idm140132052623408" class="footnote" id="idm140132052623408"><sup class="footnote">[2]</sup></a></p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-hello.png" align="middle" alt="The Annotald UI at startup" /></div></div><p>On the left-hand side of the screen, the following are present, from top
 to bottom:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 The control panel.  This contains buttons for functions such as
   saving, undo/redo, and clocking in/out from a timelog file.
@@ -182,7 +191,7 @@ dash tags.</p><p>The context menu can be dismissed by left-clicking outside of i
 Annotald users should keep their right hand on the mouse at all times;
 thus, only keys on the left hand side of the keyboard are used as key
 shortcuts (with a small number of exceptions for commands which require
-full keyboard use).<a href="#ftn.idm140264442648528" class="footnote" id="idm140264442648528"><sup class="footnote">[3]</sup></a></p><p>Generally speaking, Annotald key commands perform annotation operations
+full keyboard use).<a href="#ftn.idm140132052582432" class="footnote" id="idm140132052582432"><sup class="footnote">[3]</sup></a></p><p>Generally speaking, Annotald key commands perform annotation operations
 related to a single goal.  One key, for example, toggles between the
 tags for different kinds of argument NPs.  For more on <a class="link" href="#keycmds" title="4.3. Default keybindings">the default keybindings</a>, including their organizing principles, or on
 <a class="link" href="#customkeys" title="4.4. Custom keybindings">customizing the key commands to fit your annotation needs</a>, see the linked sections.</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_customization"></a>4. Customization</h2></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="cmdline-opts"></a>4.1. Command line options</h3></div></div></div><p>When invoked via the command line, there are several options which can
@@ -256,7 +265,7 @@ their case.  Generally speaking, these will be leaf nodes.  Although an
 entire NP (for example) might be said to have case, the only surface
 reflexes of case are the marking of individual words.  Furthermore,
 within a single NP it is possible for some constituents to not express
-the phrase’s features.<a href="#ftn.idm140264446300752" class="footnote" id="idm140264446300752"><sup class="footnote">[4]</sup></a>
+the phrase’s features.<a href="#ftn.idm140132052530080" class="footnote" id="idm140132052530080"><sup class="footnote">[4]</sup></a>
 </p><p class="simpara">Therefore, the minimal annotation that captures the linguistic facts
 places case on the leaf nodes; phrasal case can be calculated based on
 that information.
@@ -426,7 +435,7 @@ by the IcePaHC project.  It is highly recommended that users make a copy
 of this file in the working directory for their corpus, and customize it
 to their needs.  The procedure to do so is described in the following
 section.  The default keybindings are as follows (from left to
-right and top to bottom of a US keyboard layout):<a href="#ftn.idm140264440609872" class="footnote" id="idm140264440609872"><sup class="footnote">[5]</sup></a></p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+right and top to bottom of a US keyboard layout):<a href="#ftn.idm140132052430768" class="footnote" id="idm140132052430768"><sup class="footnote">[5]</sup></a></p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 Backquote (`)
 </span></dt><dd>
 Toggle the display of lemmata on or off
@@ -696,10 +705,10 @@ many trees to show at a time.  As a shortcut for <code class="literal">-n 1</cod
 use <code class="literal">-1</code> (in both cases, the last character is the numeral one).</p><p>When this mode is active, Annotald will have a “previous tree,” “next
 tree,” and “goto tree” button; the latter of which operates based on the
 index shown in the left-hand menu.  This appears as in the following
-screenshot:<a href="#ftn.idm140264440470592" class="footnote" id="idm140264440470592"><sup class="footnote">[6]</sup></a></p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-one-tree.png" align="middle" alt="One-tree mode in Annotald" /></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="timelog"></a>5.2. Event log</h3></div></div></div><p>Annotald supports keeping a log of actions that you take in the program.
+screenshot:<a href="#ftn.idm140132052291248" class="footnote" id="idm140132052291248"><sup class="footnote">[6]</sup></a></p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-one-tree.png" align="middle" alt="One-tree mode in Annotald" /></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="timelog"></a>5.2. Event log</h3></div></div></div><p>Annotald supports keeping a log of actions that you take in the program.
 This log is stored in a non-user-readable file called
 <code class="literal">annotaldLog.shelve</code> in the directory from which Annotald is
-invoked.<a href="#ftn.idm140264440464912" class="footnote" id="idm140264440464912"><sup class="footnote">[7]</sup></a>  There are three levels of logging possible:</p><div class="informaltable"><table cellpadding="4px" style="border-collapse: collapse;border-top: 3px solid #527bbd; border-bottom: 3px solid #527bbd; border-left: 3px solid #527bbd; border-right: 3px solid #527bbd; "><colgroup><col class="col_1" /><col class="col_2" /><col class="col_3" /></colgroup><thead><tr><th style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"> Type                   </th><th style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"> <a class="link" href="#cmdline-q">Command line flag</a> </th><th style="border-bottom: 1px solid #527bbd; " align="center" valign="top"> <a class="link" href="#logdetail"><code class="literal">logDetail</code></a></th></tr></thead><tbody><tr><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>no logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"><p><code class="literal">-q</code></p></td><td style="border-bottom: 1px solid #527bbd; " align="center" valign="top"><p>N/A</p></td></tr><tr><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>major event logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"><p>none</p></td><td style="border-bottom: 1px solid #527bbd; " align="center" valign="top"><p><code class="literal">false</code></p></td></tr><tr><td style="border-right: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>full logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; " align="center" valign="top"><p>none</p></td><td style="" align="center" valign="top"><p><code class="literal">true</code></p></td></tr></tbody></table></div><p>The “major event logging” setting records when the program is opened and
+invoked.<a href="#ftn.idm140132052285568" class="footnote" id="idm140132052285568"><sup class="footnote">[7]</sup></a>  There are three levels of logging possible:</p><div class="informaltable"><table cellpadding="4px" style="border-collapse: collapse;border-top: 3px solid #527bbd; border-bottom: 3px solid #527bbd; border-left: 3px solid #527bbd; border-right: 3px solid #527bbd; "><colgroup><col class="col_1" /><col class="col_2" /><col class="col_3" /></colgroup><thead><tr><th style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"> Type                   </th><th style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"> <a class="link" href="#cmdline-q">Command line flag</a> </th><th style="border-bottom: 1px solid #527bbd; " align="center" valign="top"> <a class="link" href="#logdetail"><code class="literal">logDetail</code></a></th></tr></thead><tbody><tr><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>no logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"><p><code class="literal">-q</code></p></td><td style="border-bottom: 1px solid #527bbd; " align="center" valign="top"><p>N/A</p></td></tr><tr><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>major event logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; border-bottom: 1px solid #527bbd; " align="center" valign="top"><p>none</p></td><td style="border-bottom: 1px solid #527bbd; " align="center" valign="top"><p><code class="literal">false</code></p></td></tr><tr><td style="border-right: 1px solid #527bbd; " align="left" valign="top"><p><span class="strong"><strong>full logging</strong></span></p></td><td style="border-right: 1px solid #527bbd; " align="center" valign="top"><p>none</p></td><td style="" align="center" valign="top"><p><code class="literal">true</code></p></td></tr></tbody></table></div><p>The “major event logging” setting records when the program is opened and
 closed, as well as when the file is validated or saved.  That is, it
 records events visible to the Annotald server.  It does not record any
 actions taken in the browser.  Full logging, on the other hand, records
@@ -711,7 +720,7 @@ built-in ways of generating reports from this data, such as how much
 annotation time has been spent on each file, or (with full logging
 enabled) which keys are most often pressed.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="casemenu"></a>5.3. Case menu</h3></div></div></div><p>Annotald includes support for manipulating case marking information in
 corpora which store that information in a supported format.  In order to
-be supported, the case must:<a href="#ftn.idm140264440435472" class="footnote" id="idm140264440435472"><sup class="footnote">[8]</sup></a></p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+be supported, the case must:<a href="#ftn.idm140132052256048" class="footnote" id="idm140132052256048"><sup class="footnote">[8]</sup></a></p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 be stored as dash tags,
 </li><li class="listitem">
 at the word level,
@@ -760,7 +769,7 @@ Or (vertical bar)
 This creates an “OR” node as the parent of the node
 from which it is clicked.  The daughters of an “OR” node are interpreted
 disjunctively, instead of conjunctively (the default).  An example of
-such a search is shown in the follwoing screenshots:<a href="#ftn.idm140264440400512" class="footnote" id="idm140264440400512"><sup class="footnote">[9]</sup></a>
+such a search is shown in the follwoing screenshots:<a href="#ftn.idm140132052221008" class="footnote" id="idm140132052221008"><sup class="footnote">[9]</sup></a>
 </dd></dl></div><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-search-or.png" align="middle" alt="A disjunctive Annotald search" /></div></div><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/annotald-search-or-result.png" align="middle" alt="Results of a disjunctive Annotald search" /></div></div><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 Deep (“D”)
 </span></dt><dd>
@@ -900,14 +909,14 @@ character it must be backslash-escaped.
 </p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="externalvalidation"></a>6.2. External validation</h3></div></div></div><p>Annotald includes a feature that allows the user to interactively submit
 the contents of a file to a separate program, and receive feedback from
 that program.  This system is (intentionally) very powerful – the
-external program can be any Python function,<a href="#ftn.idm140264440333856" class="footnote" id="idm140264440333856"><sup class="footnote">[10]</sup></a> and the feedback comes in the
+external program can be any Python function,<a href="#ftn.idm140132052154112" class="footnote" id="idm140132052154112"><sup class="footnote">[10]</sup></a> and the feedback comes in the
 form of that function modifying the file contents; these modified file
 contents replace the original file in the Annotald interface.  It is
 hoped that this flexibility will facilitate a wide variety of automated
 workflows.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/icons/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>This feature presently causes all undo history to be erased when
 the file is sent for validation.</p></td></tr></table></div><p>One conventionalized way of using this facility is to perform
 <span class="emphasis"><em>validation queries</em></span> on the file – queries that will find anomalous
-structures, and flag them for annotator attnetion.<a href="#ftn.idm140264440330816" class="footnote" id="idm140264440330816"><sup class="footnote">[11]</sup></a>  In this section, we will discuss setting up such a
+structures, and flag them for annotator attnetion.<a href="#ftn.idm140132052151072" class="footnote" id="idm140132052151072"><sup class="footnote">[11]</sup></a>  In this section, we will discuss setting up such a
 system, using CorpusSearch queries.</p><p>The specification of validation queries involves customizing the Python
 settings file.  An annotated example of such a file is given immediately
 below.</p><pre class="programlisting">import os.path
@@ -1056,7 +1065,7 @@ followed by the name of an auxiliary command, followed by that command’s
 arguments.  Unless otherwise indicated, commands that operate on a file
 modify the file in place.  If you want to preserve an unmodified version
 of the file, make sure to make a copy before invoking
-<code class="literal">annotald-aux</code>.<a href="#ftn.idm140264440260176" class="footnote" id="idm140264440260176"><sup class="footnote">[12]</sup></a>  The available commands are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<code class="literal">annotald-aux</code>.<a href="#ftn.idm140132052071216" class="footnote" id="idm140132052071216"><sup class="footnote">[12]</sup></a>  The available commands are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <code class="literal">convert</code>
 </span></dt><dd>
 Convert a file from another format into Annotald’ output
@@ -1191,7 +1200,7 @@ A clitic movement trace
 </span></dt><dd>
 A trace of rightward movement or extraposition (mnemonic:
     Interpret Constituent Here)
-</dd></dl></div></li></ul></div></li></ul></div></div></div><div class="footnotes"><br /><hr style="width:100; text-align:left;margin-left: 0" /><div id="ftn.idm140264441337584" class="footnote"><p><a href="#idm140264441337584" class="simpara"><sup class="simpara">[1] </sup></a>There are two meanings
+</dd></dl></div></li></ul></div></li></ul></div></div></div><div class="footnotes"><br /><hr style="width:100; text-align:left;margin-left: 0" /><div id="ftn.idm140132056589040" class="footnote"><p><a href="#idm140132056589040" class="simpara"><sup class="simpara">[1] </sup></a>There are two meanings
 of the term “Free Software.”  The first refers to the software being
 provided free of charge.  The second means that the software’s source
 code is freely available to its users for them to inspect, modify, and
@@ -1199,26 +1208,26 @@ reuse.  The second of these definitions is the most important to
 ensuring scientific openness; as it happens Annotald and its
 dependencies fulfill both definitions.  For more information, consult
 <a class="ulink" href="https://www.gnu.org/philosophy/free-sw.html" target="_top">this document from the Free
-Software Foundation</a>.</p></div><div id="ftn.idm140264441316944" class="footnote"><p><a href="#idm140264441316944" class="simpara"><sup class="simpara">[2] </sup></a>You may notice subtle differences in some
+Software Foundation</a>.</p></div><div id="ftn.idm140132052623408" class="footnote"><p><a href="#idm140132052623408" class="simpara"><sup class="simpara">[2] </sup></a>You may notice subtle differences in some
 screenshots, reflecting ways in which the Annotald UI has evolved over
 its development.  It is hoped that these will not detract from the
-points being explicated.</p></div><div id="ftn.idm140264442648528" class="footnote"><p><a href="#idm140264442648528" class="simpara"><sup class="simpara">[3] </sup></a>Left handed users may wish to use the left
+points being explicated.</p></div><div id="ftn.idm140132052582432" class="footnote"><p><a href="#idm140132052582432" class="simpara"><sup class="simpara">[3] </sup></a>Left handed users may wish to use the left
 hand for mousing and the right hand for the keyboard, but the principle
 of using one hand exclusively for each operation remains the same.
 Additionally, the default configuration will have to be adjusted for
-users of non-English keyboard layouts.</p></div><div id="ftn.idm140264446300752" class="footnote"><p><a href="#idm140264446300752" class="simpara"><sup class="simpara">[4] </sup></a>For a classic discussion of this
+users of non-English keyboard layouts.</p></div><div id="ftn.idm140132052530080" class="footnote"><p><a href="#idm140132052530080" class="simpara"><sup class="simpara">[4] </sup></a>For a classic discussion of this
 phenomenon in Spanish and Portugese of Latin America, consult Guy,
 Gregory. 1981. “Parallel variability in American dialects of Spanish and
 Portuguese.” <span class="emphasis"><em>Variation omnibus</em></span>, ed. by David Sankoff and Henrietta
-Cedergren, 85-95. Alberta: Carbondale and Edmonton</p></div><div id="ftn.idm140264440609872" class="footnote"><p><a href="#idm140264440609872" class="simpara"><sup class="simpara">[5] </sup></a>To see an
+Cedergren, 85-95. Alberta: Carbondale and Edmonton</p></div><div id="ftn.idm140132052430768" class="footnote"><p><a href="#idm140132052430768" class="simpara"><sup class="simpara">[5] </sup></a>To see an
 exact listing of the tags included in each category described below, you
-should consult the configuration file itself.</p></div><div id="ftn.idm140264440470592" class="footnote"><p><a href="#idm140264440470592" class="simpara"><sup class="simpara">[6] </sup></a>The screenshot is somewhat cramped, owing to the
+should consult the configuration file itself.</p></div><div id="ftn.idm140132052291248" class="footnote"><p><a href="#idm140132052291248" class="simpara"><sup class="simpara">[6] </sup></a>The screenshot is somewhat cramped, owing to the
 artificially small size of the window.  When working with the interface
-at full-screen size, the interface will be less crowded.</p></div><div id="ftn.idm140264440464912" class="footnote"><p><a href="#idm140264440464912" class="simpara"><sup class="simpara">[7] </sup></a>This file is in the format used by the <code class="literal">shelve</code> Python
+at full-screen size, the interface will be less crowded.</p></div><div id="ftn.idm140132052285568" class="footnote"><p><a href="#idm140132052285568" class="simpara"><sup class="simpara">[7] </sup></a>This file is in the format used by the <code class="literal">shelve</code> Python
 library.  Interested users may consult
 <a class="ulink" href="http://docs.python.org/library/shelve.html" target="_top">the module’s documentation</a>
 and Annotald’s source code if they desire to create custom code to
-analyze the log.</p></div><div id="ftn.idm140264440435472" class="footnote"><p><a href="#idm140264440435472" class="simpara"><sup class="simpara">[8] </sup></a>The YCOE does not follow these
+analyze the log.</p></div><div id="ftn.idm140132052256048" class="footnote"><p><a href="#idm140132052256048" class="simpara"><sup class="simpara">[8] </sup></a>The YCOE does not follow these
 guidelines.  Case is marked on phrasal nodes with dash tags (as a
 substitute for grammatical role marking: <span class="corpustext">SBJ</span> etc.), and on words with
 a caret: <span class="corpustext">^N</span> for nominative etc.  The Penn parsed corpora of Middle
@@ -1226,11 +1235,11 @@ English and later time periods indicate genitive with a <span class="corpustext"
 directly concatenated with a leaf’s label, but this is not the kind of
 case-marking that this Annotald feature addresses.  The IcePaHC corpus
 does obey these conditions (unsurprisingly, since Annotald comes from
-that project), as does the Penn Parsed Corpus of Historical Greek.</p></div><div id="ftn.idm140264440400512" class="footnote"><p><a href="#idm140264440400512" class="simpara"><sup class="simpara">[9] </sup></a>Note that
+that project), as does the Penn Parsed Corpus of Historical Greek.</p></div><div id="ftn.idm140132052221008" class="footnote"><p><a href="#idm140132052221008" class="simpara"><sup class="simpara">[9] </sup></a>Note that
 the results are the same as the previously illustrated sisterhood
-search, though the queries are distinct.</p></div><div id="ftn.idm140264440333856" class="footnote"><p><a href="#idm140264440333856" class="simpara"><sup class="simpara">[10] </sup></a>Which in turn may
-invoke any program on the user’s computer</p></div><div id="ftn.idm140264440330816" class="footnote"><p><a href="#idm140264440330816" class="simpara"><sup class="simpara">[11] </sup></a>This idea
+search, though the queries are distinct.</p></div><div id="ftn.idm140132052154112" class="footnote"><p><a href="#idm140132052154112" class="simpara"><sup class="simpara">[10] </sup></a>Which in turn may
+invoke any program on the user’s computer</p></div><div id="ftn.idm140132052151072" class="footnote"><p><a href="#idm140132052151072" class="simpara"><sup class="simpara">[11] </sup></a>This idea
 stems from discussions with Beatrice Santorini about how her parsing
-methodology.</p></div><div id="ftn.idm140264440260176" class="footnote"><p><a href="#idm140264440260176" class="simpara"><sup class="simpara">[12] </sup></a>You can also use another means of recording the
+methodology.</p></div><div id="ftn.idm140132052071216" class="footnote"><p><a href="#idm140132052071216" class="simpara"><sup class="simpara">[12] </sup></a>You can also use another means of recording the
 prior state of the file, of course, such as checking it into a version
 control system.</p></div></div></div></body></html>
