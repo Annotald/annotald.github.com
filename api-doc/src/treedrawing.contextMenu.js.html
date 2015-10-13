@@ -82,227 +82,241 @@
 <a name='L67'></a>               <span class="keyword">true</span>, phrase, terminal);
 <a name='L68'></a>}
 <a name='L69'></a>
-<a name='L70'></a><span class="comment">// Load the custom context menu "leaf before" items</span>
-<a name='L71'></a>customConLeafBefore();
-<a name='L72'></a>
-<a name='L73'></a><span class="keyword">var</span> defaultsPhrases = defaultConMenuGroup;
-<a name='L74'></a>
-<a name='L75'></a><span class="comment">/**
-<a name='L76'></a> * Compute the suggested changes for the context menu for a label.
-<a name='L77'></a> *
-<a name='L78'></a> *<span class="phpdoc"> @param</span> {String} label
-<a name='L79'></a> *<span class="phpdoc"> @private</span>
-<a name='L80'></a> */</span>
-<a name='L81'></a><span class="keyword">function</span> getSuggestions(label) {
-<a name='L82'></a>    <span class="keyword">var</span> indstr = <span class="string">""</span>,
-<a name='L83'></a>        indtype = <span class="string">""</span>,
-<a name='L84'></a>        theCase = <span class="string">""</span>;
-<a name='L85'></a>    <span class="keyword">if</span> (parseIndex(label) > <span class="number">0</span>) {
-<a name='L86'></a>        indstr = parseIndex(label);
-<a name='L87'></a>        indtype = parseIndexType(label);
-<a name='L88'></a>    }
-<a name='L89'></a>    label = parseLabel(label);
-<a name='L90'></a>    theCase = labelGetCase(label);
-<a name='L91'></a>    <span class="keyword">if</span> (theCase !== <span class="string">""</span>) {
-<a name='L92'></a>        theCase = <span class="string">"-"</span> + theCase;
-<a name='L93'></a>    }
-<a name='L94'></a>    label = labelRemoveCase(label);
-<a name='L95'></a>
-<a name='L96'></a>    <span class="keyword">var</span> suggestions = <span class="keyword">new</span> <span class="keyword">Array</span>();
-<a name='L97'></a>    <span class="keyword">var</span> menuitems = defaultsPhrases;
-<a name='L98'></a>    <span class="keyword">if</span> (conmenus[label] != <span class="keyword">null</span>) {
-<a name='L99'></a>        menuitems = conmenus[label].suggestions;
-<a name='L100'></a>    }
-<a name='L101'></a>
-<a name='L102'></a>    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; menuitems.length; i++) {
-<a name='L103'></a>        <span class="keyword">var</span> menuitem = menuitems[i];
-<a name='L104'></a>        <span class="keyword">if</span> (isCaseLabel(menuitem)) {
-<a name='L105'></a>            menuitem += theCase;
-<a name='L106'></a>        }
-<a name='L107'></a>        suggestions.push(menuitem + indtype + indstr);
-<a name='L108'></a>    }
-<a name='L109'></a>    <span class="keyword">return</span> _.uniq(suggestions);
-<a name='L110'></a>}
-<a name='L111'></a>
-<a name='L112'></a><span class="comment">/**
-<a name='L113'></a> * Populate the context menu for a given node.
-<a name='L114'></a> *
-<a name='L115'></a> * Does not display the menu.
-<a name='L116'></a> *
-<a name='L117'></a> *<span class="phpdoc"> @param</span> {DOM node} nodeOrig
-<a name='L118'></a> *<span class="phpdoc"> @private</span>
-<a name='L119'></a> */</span>
-<a name='L120'></a><span class="keyword">function</span> loadContextMenu(nodeOrig) {
-<a name='L121'></a>    <span class="keyword">var</span> nO = $(nodeOrig),
-<a name='L122'></a>        nodeIndex = getIndex(nO),
-<a name='L123'></a>        indexSep = <span class="string">""</span>,
-<a name='L124'></a>        indexString = <span class="string">""</span>,
-<a name='L125'></a>        nodelabel = getLabel(nO),
-<a name='L126'></a>        newnode,
-<a name='L127'></a>        i;
-<a name='L128'></a>    <span class="keyword">function</span> loadConMenuMousedown () {
-<a name='L129'></a>        <span class="keyword">var</span> e = window.event;
-<a name='L130'></a>        <span class="keyword">var</span> elementId = (e.target || e.srcElement).id;
-<a name='L131'></a>        <span class="keyword">var</span> suggestion = <span class="string">""</span> + $(<span class="keyword">this</span>).text();
-<a name='L132'></a>        touchTree(nO);
-<a name='L133'></a>        setNodeLabel(nO, suggestion);
-<a name='L134'></a>        undoBarrier();
-<a name='L135'></a>        hideContextMenu();
-<a name='L136'></a>    }
-<a name='L137'></a>
-<a name='L138'></a>    <span class="keyword">if</span> (nodeIndex > -<span class="number">1</span> &amp;&amp; !shouldIndexLeaf(nO)) {
-<a name='L139'></a>        indexSep = parseIndexType(nodelabel);
-<a name='L140'></a>        indexString = indexSep + parseIndex(nodelabel);
-<a name='L141'></a>        nodelabel = parseLabel(nodelabel);
-<a name='L142'></a>    }
-<a name='L143'></a>    $(<span class="string">"#conLeft"</span>).<span class="keyword">empty</span>();
-<a name='L144'></a>    $(<span class="string">"#conLeft"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Label&lt;/div>"</span>));
-<a name='L145'></a>
-<a name='L146'></a>
-<a name='L147'></a>    <span class="keyword">var</span> suggestions = getSuggestions(nodelabel);
-<a name='L148'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; suggestions.length; i++) {
-<a name='L149'></a>        <span class="keyword">if</span> (suggestions[i] != nodelabel) {
-<a name='L150'></a>            newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
-<a name='L151'></a>                            suggestions[i]+indexString+<span class="string">"&lt;/a>&lt;/div>"</span>);
-<a name='L152'></a>            $(newnode).mousedown(loadConMenuMousedown);
-<a name='L153'></a>            $(<span class="string">"#conLeft"</span>).append(newnode);
-<a name='L154'></a>        }
-<a name='L155'></a>    }
-<a name='L156'></a>
-<a name='L157'></a>    <span class="comment">// do the right side context menu</span>
-<a name='L158'></a>    $(<span class="string">"#conRight"</span>).<span class="keyword">empty</span>();
+<a name='L70'></a><span class="comment">/**
+<a name='L71'></a> * Add a terminal node to the context menu.
+<a name='L72'></a> *
+<a name='L73'></a> * Add a terminal node that the context menu will allow inserting in the tree
+<a name='L74'></a> * after the sleected node.
+<a name='L75'></a> *
+<a name='L76'></a> *<span class="phpdoc"> @param</span> {String} phrase the label of the leaf
+<a name='L77'></a> *<span class="phpdoc"> @param</span> {String} terminal the text of the leaf
+<a name='L78'></a> */</span>
+<a name='L79'></a><span class="keyword">function</span> addConLeafAfter(phrase, terminal) {
+<a name='L80'></a>    addConLeaf(<span class="string">"("</span> + phrase + <span class="string">" "</span> + terminal + <span class="string">") &amp;gt;"</span>,
+<a name='L81'></a>               <span class="keyword">false</span>, phrase, terminal);
+<a name='L82'></a>}
+<a name='L83'></a>
+<a name='L84'></a><span class="comment">// Load the custom context menu "leaf before" items</span>
+<a name='L85'></a>customConLeafBefore();
+<a name='L86'></a>
+<a name='L87'></a><span class="keyword">var</span> defaultsPhrases = defaultConMenuGroup;
+<a name='L88'></a>
+<a name='L89'></a><span class="comment">/**
+<a name='L90'></a> * Compute the suggested changes for the context menu for a label.
+<a name='L91'></a> *
+<a name='L92'></a> *<span class="phpdoc"> @param</span> {String} label
+<a name='L93'></a> *<span class="phpdoc"> @private</span>
+<a name='L94'></a> */</span>
+<a name='L95'></a><span class="keyword">function</span> getSuggestions(label) {
+<a name='L96'></a>    <span class="keyword">var</span> indstr = <span class="string">""</span>,
+<a name='L97'></a>        indtype = <span class="string">""</span>,
+<a name='L98'></a>        theCase = <span class="string">""</span>;
+<a name='L99'></a>    <span class="keyword">if</span> (parseIndex(label) > <span class="number">0</span>) {
+<a name='L100'></a>        indstr = parseIndex(label);
+<a name='L101'></a>        indtype = parseIndexType(label);
+<a name='L102'></a>    }
+<a name='L103'></a>    label = parseLabel(label);
+<a name='L104'></a>    theCase = labelGetCase(label);
+<a name='L105'></a>    <span class="keyword">if</span> (theCase !== <span class="string">""</span>) {
+<a name='L106'></a>        theCase = <span class="string">"-"</span> + theCase;
+<a name='L107'></a>    }
+<a name='L108'></a>    label = labelRemoveCase(label);
+<a name='L109'></a>
+<a name='L110'></a>    <span class="keyword">var</span> suggestions = <span class="keyword">new</span> <span class="keyword">Array</span>();
+<a name='L111'></a>    <span class="keyword">var</span> menuitems = defaultsPhrases;
+<a name='L112'></a>    <span class="keyword">if</span> (conmenus[label] != <span class="keyword">null</span>) {
+<a name='L113'></a>        menuitems = conmenus[label].suggestions;
+<a name='L114'></a>    }
+<a name='L115'></a>
+<a name='L116'></a>    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; menuitems.length; i++) {
+<a name='L117'></a>        <span class="keyword">var</span> menuitem = menuitems[i];
+<a name='L118'></a>        <span class="keyword">if</span> (isCaseLabel(menuitem)) {
+<a name='L119'></a>            menuitem += theCase;
+<a name='L120'></a>        }
+<a name='L121'></a>        suggestions.push(menuitem + indtype + indstr);
+<a name='L122'></a>    }
+<a name='L123'></a>    <span class="keyword">return</span> _.uniq(suggestions);
+<a name='L124'></a>}
+<a name='L125'></a>
+<a name='L126'></a><span class="comment">/**
+<a name='L127'></a> * Populate the context menu for a given node.
+<a name='L128'></a> *
+<a name='L129'></a> * Does not display the menu.
+<a name='L130'></a> *
+<a name='L131'></a> *<span class="phpdoc"> @param</span> {DOM node} nodeOrig
+<a name='L132'></a> *<span class="phpdoc"> @private</span>
+<a name='L133'></a> */</span>
+<a name='L134'></a><span class="keyword">function</span> loadContextMenu(nodeOrig) {
+<a name='L135'></a>    <span class="keyword">var</span> nO = $(nodeOrig),
+<a name='L136'></a>        nodeIndex = getIndex(nO),
+<a name='L137'></a>        indexSep = <span class="string">""</span>,
+<a name='L138'></a>        indexString = <span class="string">""</span>,
+<a name='L139'></a>        nodelabel = getLabel(nO),
+<a name='L140'></a>        newnode,
+<a name='L141'></a>        i;
+<a name='L142'></a>    <span class="keyword">function</span> loadConMenuMousedown () {
+<a name='L143'></a>        <span class="keyword">var</span> e = window.event;
+<a name='L144'></a>        <span class="keyword">var</span> elementId = (e.target || e.srcElement).id;
+<a name='L145'></a>        <span class="keyword">var</span> suggestion = <span class="string">""</span> + $(<span class="keyword">this</span>).text();
+<a name='L146'></a>        touchTree(nO);
+<a name='L147'></a>        setNodeLabel(nO, suggestion);
+<a name='L148'></a>        undoBarrier();
+<a name='L149'></a>        hideContextMenu();
+<a name='L150'></a>    }
+<a name='L151'></a>
+<a name='L152'></a>    <span class="keyword">if</span> (nodeIndex > -<span class="number">1</span> &amp;&amp; !shouldIndexLeaf(nO)) {
+<a name='L153'></a>        indexSep = parseIndexType(nodelabel);
+<a name='L154'></a>        indexString = indexSep + parseIndex(nodelabel);
+<a name='L155'></a>        nodelabel = parseLabel(nodelabel);
+<a name='L156'></a>    }
+<a name='L157'></a>    $(<span class="string">"#conLeft"</span>).<span class="keyword">empty</span>();
+<a name='L158'></a>    $(<span class="string">"#conLeft"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Label&lt;/div>"</span>));
 <a name='L159'></a>
-<a name='L160'></a>    <span class="keyword">if</span> (displayCaseMenu) {
-<a name='L161'></a>        <span class="keyword">if</span> (hasCase(nO) || isCasePhrase(nO)) {
-<a name='L162'></a>            $(<span class="string">"#conRight"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Case&lt;/div>"</span>));
-<a name='L163'></a>            caseMarkers.<span class="keyword">forEach</span>(<span class="keyword">function</span>(c) {
-<a name='L164'></a>                newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>-"</span> + c +
-<a name='L165'></a>                                <span class="string">"&lt;/a>&lt;/div>"</span>);
-<a name='L166'></a>                $(newnode).mousedown(setCaseOnTag(nodeOrig, c));
-<a name='L167'></a>                $(<span class="string">"#conRight"</span>).append(newnode);
-<a name='L168'></a>            });
-<a name='L169'></a>        }
-<a name='L170'></a>    }
-<a name='L171'></a>
-<a name='L172'></a>    <span class="comment">// do addleafbefore</span>
-<a name='L173'></a>    $(<span class="string">"#conRight"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Leaf before&lt;/div>"</span>));
-<a name='L174'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; conleafs.length; i++) {
-<a name='L175'></a>        newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
-<a name='L176'></a>                        conleafs[i].suggestion + <span class="string">"&lt;/a>&lt;/div>"</span>);
-<a name='L177'></a>        $(newnode).mousedown(doConLeaf(conleafs[i], nodeOrig));
-<a name='L178'></a>        $(<span class="string">"#conRight"</span>).append(newnode);
-<a name='L179'></a>    }
-<a name='L180'></a>
-<a name='L181'></a>    $(<span class="string">"#conRightest"</span>).<span class="keyword">empty</span>();
-<a name='L182'></a>    $(<span class="string">"#conRightest"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Toggle ext.&lt;/div>"</span>));
-<a name='L183'></a>
-<a name='L184'></a>    <span class="comment">// TODO: make only a subset of the extensions togglable, i.e. introduce a</span>
-<a name='L185'></a>    <span class="comment">// new variable togglableExtensions</span>
-<a name='L186'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; extensions.length; i++) {
-<a name='L187'></a>        <span class="comment">// do the right side context menu</span>
-<a name='L188'></a>        newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
-<a name='L189'></a>                        extensions[i] + <span class="string">"&lt;/a>&lt;/div>"</span>);
-<a name='L190'></a>        $(newnode).mousedown(doToggleExtension(nodeOrig, extensions[i]));
-<a name='L191'></a>        $(<span class="string">"#conRightest"</span>).append(newnode);
-<a name='L192'></a>    }
-<a name='L193'></a>}
+<a name='L160'></a>
+<a name='L161'></a>    <span class="keyword">var</span> suggestions = getSuggestions(nodelabel);
+<a name='L162'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; suggestions.length; i++) {
+<a name='L163'></a>        <span class="keyword">if</span> (suggestions[i] != nodelabel) {
+<a name='L164'></a>            newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
+<a name='L165'></a>                            suggestions[i]+indexString+<span class="string">"&lt;/a>&lt;/div>"</span>);
+<a name='L166'></a>            $(newnode).mousedown(loadConMenuMousedown);
+<a name='L167'></a>            $(<span class="string">"#conLeft"</span>).append(newnode);
+<a name='L168'></a>        }
+<a name='L169'></a>    }
+<a name='L170'></a>
+<a name='L171'></a>    <span class="comment">// do the right side context menu</span>
+<a name='L172'></a>    $(<span class="string">"#conRight"</span>).<span class="keyword">empty</span>();
+<a name='L173'></a>
+<a name='L174'></a>    <span class="keyword">if</span> (displayCaseMenu) {
+<a name='L175'></a>        <span class="keyword">if</span> (hasCase(nO) || isCasePhrase(nO)) {
+<a name='L176'></a>            $(<span class="string">"#conRight"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Case&lt;/div>"</span>));
+<a name='L177'></a>            caseMarkers.<span class="keyword">forEach</span>(<span class="keyword">function</span>(c) {
+<a name='L178'></a>                newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>-"</span> + c +
+<a name='L179'></a>                                <span class="string">"&lt;/a>&lt;/div>"</span>);
+<a name='L180'></a>                $(newnode).mousedown(setCaseOnTag(nodeOrig, c));
+<a name='L181'></a>                $(<span class="string">"#conRight"</span>).append(newnode);
+<a name='L182'></a>            });
+<a name='L183'></a>        }
+<a name='L184'></a>    }
+<a name='L185'></a>
+<a name='L186'></a>    <span class="comment">// do addleafbefore</span>
+<a name='L187'></a>    $(<span class="string">"#conRight"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Leaf before&lt;/div>"</span>));
+<a name='L188'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; conleafs.length; i++) {
+<a name='L189'></a>        newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
+<a name='L190'></a>                        conleafs[i].suggestion + <span class="string">"&lt;/a>&lt;/div>"</span>);
+<a name='L191'></a>        $(newnode).mousedown(doConLeaf(conleafs[i], nodeOrig));
+<a name='L192'></a>        $(<span class="string">"#conRight"</span>).append(newnode);
+<a name='L193'></a>    }
 <a name='L194'></a>
-<a name='L195'></a><span class="comment">/**
-<a name='L196'></a> * Toggle the extension of a node.
-<a name='L197'></a> *
-<a name='L198'></a> * A context menu action function.
-<a name='L199'></a> *
-<a name='L200'></a> *<span class="phpdoc"> @param</span> {DOM node} node
-<a name='L201'></a> *<span class="phpdoc"> @param</span> {String} extension the extension to toggle
-<a name='L202'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
-<a name='L203'></a> *<span class="phpdoc"> @private</span>
-<a name='L204'></a> */</span>
-<a name='L205'></a><span class="keyword">function</span> doToggleExtension(node, extension) {
-<a name='L206'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
-<a name='L207'></a>        touchTree($(node));
-<a name='L208'></a>        clearSelection();
-<a name='L209'></a>        selectNode(node);
-<a name='L210'></a>        toggleExtension(extension);
-<a name='L211'></a>        undoBarrier();
-<a name='L212'></a>        hideContextMenu();
-<a name='L213'></a>        clearSelection();
-<a name='L214'></a>    };
-<a name='L215'></a>}
-<a name='L216'></a>
-<a name='L217'></a><span class="comment">/**
-<a name='L218'></a> * Set the case of a node.
-<a name='L219'></a> *
-<a name='L220'></a> * A context menu action function.  Recurses into children of this node,
-<a name='L221'></a> * stopping when a barrier (case node or explicitly defined barrier) is
-<a name='L222'></a> * reached.
-<a name='L223'></a> *
-<a name='L224'></a> *<span class="phpdoc"> @param</span> {DOM node} node
-<a name='L225'></a> *<span class="phpdoc"> @param</span> {String} theCase the case to assign
-<a name='L226'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
-<a name='L227'></a> *<span class="phpdoc"> @private</span>
-<a name='L228'></a> */</span>
-<a name='L229'></a><span class="keyword">function</span> setCaseOnTag(node, theCase) {
-<a name='L230'></a>    <span class="keyword">function</span> doKids(n, override) {
-<a name='L231'></a>        <span class="keyword">if</span> (isCaseNode(n)) {
-<a name='L232'></a>            setCase(n, theCase);
-<a name='L233'></a>        } <span class="keyword">else</span> <span class="keyword">if</span> (_.contains(caseBarriers, getLabel(n).split(<span class="string">"-"</span>)[<span class="number">0</span>]) &amp;&amp;
-<a name='L234'></a>                   !n.<span class="keyword">parent</span>().is(<span class="string">".CONJP"</span>) &amp;&amp;
-<a name='L235'></a>                   !override) {
-<a name='L236'></a>            <span class="comment">// nothing</span>
-<a name='L237'></a>        } <span class="keyword">else</span> {
-<a name='L238'></a>            n.children(<span class="string">".snode"</span>).each(<span class="keyword">function</span>() {
-<a name='L239'></a>                doKids($(<span class="keyword">this</span>));
-<a name='L240'></a>            });
-<a name='L241'></a>        }
-<a name='L242'></a>    }
-<a name='L243'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
-<a name='L244'></a>        <span class="keyword">var</span> n = $(node);
-<a name='L245'></a>        touchTree(n);
-<a name='L246'></a>        doKids(n, <span class="keyword">true</span>);
-<a name='L247'></a>        undoBarrier();
-<a name='L248'></a>    };
-<a name='L249'></a>}
-<a name='L250'></a>
-<a name='L251'></a><span class="comment">/**
-<a name='L252'></a> * Insert a leaf node.
-<a name='L253'></a> *
-<a name='L254'></a> * A context menu action function.
-<a name='L255'></a> *
-<a name='L256'></a> *<span class="phpdoc"> @param</span> {Object} conleaf an object describing the leaf to be added.  Has the
-<a name='L257'></a> * following keys:
-<a name='L258'></a> *
-<a name='L259'></a> * - `before` Boolean, insert this leaf beofre or fter the target
-<a name='L260'></a> * - `label` String, the label of the node to insert
-<a name='L261'></a> * - `word` String, the text of the node to insert
-<a name='L262'></a> *<span class="phpdoc"> @param</span> {DOM node} node
-<a name='L263'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
-<a name='L264'></a> *<span class="phpdoc"> @private</span>
-<a name='L265'></a> */</span>
-<a name='L266'></a><span class="keyword">function</span> doConLeaf(conleaf, node) {
-<a name='L267'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
-<a name='L268'></a>        makeLeaf(conleaf.before, conleaf.label, conleaf.word, node, <span class="keyword">true</span>);
-<a name='L269'></a>        undoBarrier();
-<a name='L270'></a>        hideContextMenu();
-<a name='L271'></a>    };
-<a name='L272'></a>}
-<a name='L273'></a>
-<a name='L274'></a><span class="comment">// Local Variables:</span>
-<a name='L275'></a><span class="comment">// js2-additional-externs: ("$" "setTimeout" "customCommands\</span>
-<a name='L276'></a><span class="comment">// " "customConLeafBefore" "customConMenuGroups" "extensions" "vextensions\</span>
-<a name='L277'></a><span class="comment">// " "clause_extensions" "JSON" "makeLeaf" "stackTree" "getLabel" "setNodeLabel\</span>
-<a name='L278'></a><span class="comment">// " "hideContextMenu" "clearSelection" "toggleExtension" "selectNode\</span>
-<a name='L279'></a><span class="comment">// " "parseIndex" "parseLabel" "defaultConMenuGroup" "getIndex" "parseIndexType\</span>
-<a name='L280'></a><span class="comment">// " "displayCaseMenu" "caseTags" "casePhrases" "hasCase" "touchTree\</span>
-<a name='L281'></a><span class="comment">// " "startnode" "_" "setCase" "caseBarriers" "isCasePhrase" "isCaseNode\</span>
-<a name='L282'></a><span class="comment">// " "isCaseLabel" "labelHasCase" "labelGetCase" "labelRemoveCase" "shouldIndexLeaf")</span>
-<a name='L283'></a><span class="comment">// indent-tabs-mode: nil</span>
-<a name='L284'></a><span class="comment">// End:</span>
-<a name='L285'></a>
+<a name='L195'></a>    $(<span class="string">"#conRightest"</span>).<span class="keyword">empty</span>();
+<a name='L196'></a>    $(<span class="string">"#conRightest"</span>).append($(<span class="string">"&lt;div class='conMenuHeading'>Toggle ext.&lt;/div>"</span>));
+<a name='L197'></a>
+<a name='L198'></a>    <span class="comment">// TODO: make only a subset of the extensions togglable, i.e. introduce a</span>
+<a name='L199'></a>    <span class="comment">// new variable togglableExtensions</span>
+<a name='L200'></a>    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; extensions.length; i++) {
+<a name='L201'></a>        <span class="comment">// do the right side context menu</span>
+<a name='L202'></a>        newnode = $(<span class="string">"&lt;div class='conMenuItem'>&lt;a href='#'>"</span> +
+<a name='L203'></a>                        extensions[i] + <span class="string">"&lt;/a>&lt;/div>"</span>);
+<a name='L204'></a>        $(newnode).mousedown(doToggleExtension(nodeOrig, extensions[i]));
+<a name='L205'></a>        $(<span class="string">"#conRightest"</span>).append(newnode);
+<a name='L206'></a>    }
+<a name='L207'></a>}
+<a name='L208'></a>
+<a name='L209'></a><span class="comment">/**
+<a name='L210'></a> * Toggle the extension of a node.
+<a name='L211'></a> *
+<a name='L212'></a> * A context menu action function.
+<a name='L213'></a> *
+<a name='L214'></a> *<span class="phpdoc"> @param</span> {DOM node} node
+<a name='L215'></a> *<span class="phpdoc"> @param</span> {String} extension the extension to toggle
+<a name='L216'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
+<a name='L217'></a> *<span class="phpdoc"> @private</span>
+<a name='L218'></a> */</span>
+<a name='L219'></a><span class="keyword">function</span> doToggleExtension(node, extension) {
+<a name='L220'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
+<a name='L221'></a>        touchTree($(node));
+<a name='L222'></a>        clearSelection();
+<a name='L223'></a>        selectNode(node);
+<a name='L224'></a>        toggleExtension(extension);
+<a name='L225'></a>        undoBarrier();
+<a name='L226'></a>        hideContextMenu();
+<a name='L227'></a>        clearSelection();
+<a name='L228'></a>    };
+<a name='L229'></a>}
+<a name='L230'></a>
+<a name='L231'></a><span class="comment">/**
+<a name='L232'></a> * Set the case of a node.
+<a name='L233'></a> *
+<a name='L234'></a> * A context menu action function.  Recurses into children of this node,
+<a name='L235'></a> * stopping when a barrier (case node or explicitly defined barrier) is
+<a name='L236'></a> * reached.
+<a name='L237'></a> *
+<a name='L238'></a> *<span class="phpdoc"> @param</span> {DOM node} node
+<a name='L239'></a> *<span class="phpdoc"> @param</span> {String} theCase the case to assign
+<a name='L240'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
+<a name='L241'></a> *<span class="phpdoc"> @private</span>
+<a name='L242'></a> */</span>
+<a name='L243'></a><span class="keyword">function</span> setCaseOnTag(node, theCase) {
+<a name='L244'></a>    <span class="keyword">function</span> doKids(n, override) {
+<a name='L245'></a>        <span class="keyword">if</span> (isCaseNode(n)) {
+<a name='L246'></a>            setCase(n, theCase);
+<a name='L247'></a>        } <span class="keyword">else</span> <span class="keyword">if</span> (_.contains(caseBarriers, getLabel(n).split(<span class="string">"-"</span>)[<span class="number">0</span>]) &amp;&amp;
+<a name='L248'></a>                   !n.<span class="keyword">parent</span>().is(<span class="string">".CONJP"</span>) &amp;&amp;
+<a name='L249'></a>                   !override) {
+<a name='L250'></a>            <span class="comment">// nothing</span>
+<a name='L251'></a>        } <span class="keyword">else</span> {
+<a name='L252'></a>            n.children(<span class="string">".snode"</span>).each(<span class="keyword">function</span>() {
+<a name='L253'></a>                doKids($(<span class="keyword">this</span>));
+<a name='L254'></a>            });
+<a name='L255'></a>        }
+<a name='L256'></a>    }
+<a name='L257'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
+<a name='L258'></a>        <span class="keyword">var</span> n = $(node);
+<a name='L259'></a>        touchTree(n);
+<a name='L260'></a>        doKids(n, <span class="keyword">true</span>);
+<a name='L261'></a>        undoBarrier();
+<a name='L262'></a>    };
+<a name='L263'></a>}
+<a name='L264'></a>
+<a name='L265'></a><span class="comment">/**
+<a name='L266'></a> * Insert a leaf node.
+<a name='L267'></a> *
+<a name='L268'></a> * A context menu action function.
+<a name='L269'></a> *
+<a name='L270'></a> *<span class="phpdoc"> @param</span> {Object} conleaf an object describing the leaf to be added.  Has the
+<a name='L271'></a> * following keys:
+<a name='L272'></a> *
+<a name='L273'></a> * - `before` Boolean, insert this leaf beofre or fter the target
+<a name='L274'></a> * - `label` String, the label of the node to insert
+<a name='L275'></a> * - `word` String, the text of the node to insert
+<a name='L276'></a> *<span class="phpdoc"> @param</span> {DOM node} node
+<a name='L277'></a> *<span class="phpdoc"> @returns</span> {Function} A function which, when called, will execute the action.
+<a name='L278'></a> *<span class="phpdoc"> @private</span>
+<a name='L279'></a> */</span>
+<a name='L280'></a><span class="keyword">function</span> doConLeaf(conleaf, node) {
+<a name='L281'></a>    <span class="keyword">return</span> <span class="keyword">function</span>() {
+<a name='L282'></a>        makeLeaf(conleaf.before, conleaf.label, conleaf.word, node, <span class="keyword">true</span>);
+<a name='L283'></a>        undoBarrier();
+<a name='L284'></a>        hideContextMenu();
+<a name='L285'></a>    };
+<a name='L286'></a>}
+<a name='L287'></a>
+<a name='L288'></a><span class="comment">// Local Variables:</span>
+<a name='L289'></a><span class="comment">// js2-additional-externs: ("$" "setTimeout" "customCommands\</span>
+<a name='L290'></a><span class="comment">// " "customConLeafBefore" "customConMenuGroups" "extensions" "vextensions\</span>
+<a name='L291'></a><span class="comment">// " "clause_extensions" "JSON" "makeLeaf" "stackTree" "getLabel" "setNodeLabel\</span>
+<a name='L292'></a><span class="comment">// " "hideContextMenu" "clearSelection" "toggleExtension" "selectNode\</span>
+<a name='L293'></a><span class="comment">// " "parseIndex" "parseLabel" "defaultConMenuGroup" "getIndex" "parseIndexType\</span>
+<a name='L294'></a><span class="comment">// " "displayCaseMenu" "caseTags" "casePhrases" "hasCase" "touchTree\</span>
+<a name='L295'></a><span class="comment">// " "startnode" "_" "setCase" "caseBarriers" "isCasePhrase" "isCaseNode\</span>
+<a name='L296'></a><span class="comment">// " "isCaseLabel" "labelHasCase" "labelGetCase" "labelRemoveCase" "shouldIndexLeaf")</span>
+<a name='L297'></a><span class="comment">// indent-tabs-mode: nil</span>
+<a name='L298'></a><span class="comment">// End:</span>
+<a name='L299'></a>
 </code>
   </pre>
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Tue Sep 23 2014 15:01:26 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Tue Oct 13 2015 10:27:06 GMT-0400 (EDT)
 </footer>
 
 </body>
