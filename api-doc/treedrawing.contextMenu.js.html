@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: treedrawing.contextMenu.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: treedrawing.contextMenu.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// Copyright (c) 2011 Anton Karl Ingason, Aaron Ecay
+
+// This file is part of the Annotald program for annotating
+// phrase-structure treebanks in the Penn Treebank style.
+
+// This file is distributed under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either
+// version 3 of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+// General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this program.  If not, see
+// &lt;http://www.gnu.org/licenses/>.
+
+var conmenus = new Object();
+var conleafs = new Array();
+
+function addConMenu(label, suggestions) {
+    conmenus[label] = {
+        suggestions : suggestions
+    };
+}
+
+function addConLeaf(suggestion, before, label, word) {
+    var conleaf = {
+        suggestion : suggestion,
+        before : before,
+        label : label,
+        word : word
+    };
+
+    conleafs.push(conleaf);
+}
+
+/**
+ * Add a group of labels to the context menu.
+ *
+ * When activating the context menu, if the label of the targeted node belongs
+ * to one of these groups, the other entries in the group will be suggested as
+ * new labels.
+ *
+ * @param {Array&lt;String>} group
+ */
+function addConMenuGroup(group) {
+    for(var i = 0; i &lt; group.length; i++){
+        addConMenu(group[i], group);
+    }
+}
+
+// Load the custom context menu groups from user settings file
+if (typeof customConMenuGroups !== "undefined") {
+    customConMenuGroups();
+}
+
+/**
+ * Add a terminal node to the context menu.
+ *
+ * Add a terminal node that the context menu will allow inserting in the tree.
+ *
+ * @param {String} phrase the label of the leaf
+ * @param {String} terminal the text of the leaf
+ */
+function addConLeafBefore(phrase, terminal) {
+    addConLeaf("&amp;lt; (" + phrase + " " + terminal + ")",
+               true, phrase, terminal);
+}
+
+/**
+ * Add a terminal node to the context menu.
+ *
+ * Add a terminal node that the context menu will allow inserting in the tree
+ * after the sleected node.
+ *
+ * @param {String} phrase the label of the leaf
+ * @param {String} terminal the text of the leaf
+ */
+function addConLeafAfter(phrase, terminal) {
+    addConLeaf("(" + phrase + " " + terminal + ") &amp;gt;",
+               false, phrase, terminal);
+}
+
+// Load the custom context menu "leaf before" items
+if (typeof customConLeafBefore !== "undefined") {
+    customConLeafBefore();
+}
+
+var defaultsPhrases = typeof defaultConMenuGroup === "undefined" ? "NP" : defaultConMenuGroup;
+
+/**
+ * Compute the suggested changes for the context menu for a label.
+ *
+ * @param {String} label
+ * @private
+ */
+function getSuggestions(label) {
+    var indstr = "",
+        indtype = "",
+        theCase = "";
+    if (parseIndex(label) > 0) {
+        indstr = parseIndex(label);
+        indtype = parseIndexType(label);
+    }
+    label = parseLabel(label);
+    theCase = labelGetCase(label);
+    if (theCase !== "") {
+        theCase = "-" + theCase;
+    }
+    label = labelRemoveCase(label);
+
+    var suggestions = new Array();
+    var menuitems = defaultsPhrases;
+    if (conmenus[label] != null) {
+        menuitems = conmenus[label].suggestions;
+    }
+
+    for (var i = 0; i &lt; menuitems.length; i++) {
+        var menuitem = menuitems[i];
+        if (isCaseLabel(menuitem)) {
+            menuitem += theCase;
+        }
+        suggestions.push(menuitem + indtype + indstr);
+    }
+    return _.uniq(suggestions);
+}
+
+/**
+ * Populate the context menu for a given node.
+ *
+ * Does not display the menu.
+ *
+ * @param {Node} nodeOrig
+ * @private
+ */
+function loadContextMenu(nodeOrig) {
+    var nO = $(nodeOrig),
+        nodeIndex = getIndex(nO),
+        indexSep = "",
+        indexString = "",
+        nodelabel = getLabel(nO),
+        newnode,
+        i;
+    function loadConMenuMousedown () {
+        var e = window.event;
+        var elementId = (e.target || e.srcElement).id;
+        var suggestion = "" + $(this).text();
+        touchTree(nO);
+        setNodeLabel(nO, suggestion);
+        undoBarrier();
+        hideContextMenu();
+    }
+
+    if (nodeIndex > -1 &amp;&amp; !shouldIndexLeaf(nO)) {
+        indexSep = parseIndexType(nodelabel);
+        indexString = indexSep + parseIndex(nodelabel);
+        nodelabel = parseLabel(nodelabel);
+    }
+    $("#conLeft").empty();
+    $("#conLeft").append($("&lt;div class='conMenuHeading'>Label&lt;/div>"));
+
+
+    var suggestions = getSuggestions(nodelabel);
+    for (i = 0; i &lt; suggestions.length; i++) {
+        if (suggestions[i] != nodelabel) {
+            newnode = $("&lt;div class='conMenuItem'>&lt;a href='#'>" +
+                            suggestions[i]+indexString+"&lt;/a>&lt;/div>");
+            $(newnode).mousedown(loadConMenuMousedown);
+            $("#conLeft").append(newnode);
+        }
+    }
+
+    // do the right side context menu
+    $("#conRight").empty();
+
+    if (displayCaseMenu) {
+        if (hasCase(nO) || isCasePhrase(nO)) {
+            $("#conRight").append($("&lt;div class='conMenuHeading'>Case&lt;/div>"));
+            caseMarkers.forEach(function(c) {
+                newnode = $("&lt;div class='conMenuItem'>&lt;a href='#'>-" + c +
+                                "&lt;/a>&lt;/div>");
+                $(newnode).mousedown(setCaseOnTag(nodeOrig, c));
+                $("#conRight").append(newnode);
+            });
+        }
+    }
+
+    // do addleafbefore
+    $("#conRight").append($("&lt;div class='conMenuHeading'>Leaf before&lt;/div>"));
+    for (i = 0; i &lt; conleafs.length; i++) {
+        newnode = $("&lt;div class='conMenuItem'>&lt;a href='#'>" +
+                        conleafs[i].suggestion + "&lt;/a>&lt;/div>");
+        $(newnode).mousedown(doConLeaf(conleafs[i], nodeOrig));
+        $("#conRight").append(newnode);
+    }
+
+    $("#conRightest").empty();
+    $("#conRightest").append($("&lt;div class='conMenuHeading'>Toggle ext.&lt;/div>"));
+
+    // TODO: make only a subset of the extensions togglable, i.e. introduce a
+    // new variable togglableExtensions
+    for (i = 0; i &lt; extensions.length; i++) {
+        // do the right side context menu
+        newnode = $("&lt;div class='conMenuItem'>&lt;a href='#'>" +
+                        extensions[i] + "&lt;/a>&lt;/div>");
+        $(newnode).mousedown(doToggleExtension(nodeOrig, extensions[i]));
+        $("#conRightest").append(newnode);
+    }
+}
+
+/**
+ * Toggle the extension of a node.
+ *
+ * A context menu action function.
+ *
+ * @param {Node} node
+ * @param {String} extension the extension to toggle
+ * @returns {Function} A function which, when called, will execute the action.
+ * @private
+ */
+function doToggleExtension(node, extension) {
+    return function() {
+        touchTree($(node));
+        clearSelection();
+        selectNode(node);
+        toggleExtension(extension);
+        undoBarrier();
+        hideContextMenu();
+        clearSelection();
+    };
+}
+
+/**
+ * Set the case of a node.
+ *
+ * A context menu action function.  Recurses into children of this node,
+ * stopping when a barrier (case node or explicitly defined barrier) is
+ * reached.
+ *
+ * @param {Node} node
+ * @param {String} theCase the case to assign
+ * @returns {Function} A function which, when called, will execute the action.
+ * @private
+ */
+function setCaseOnTag(node, theCase) {
+    function doKids(n, override) {
+        if (isCaseNode(n)) {
+            setCase(n, theCase);
+        } else if (_.contains(caseBarriers, getLabel(n).split("-")[0]) &amp;&amp;
+                   !n.parent().is(".CONJP") &amp;&amp;
+                   !override) {
+            // nothing
+        } else {
+            n.children(".snode").each(function() {
+                doKids($(this));
+            });
+        }
+    }
+    return function() {
+        var n = $(node);
+        touchTree(n);
+        doKids(n, true);
+        undoBarrier();
+    };
+}
+
+/**
+ * Insert a leaf node.
+ *
+ * A context menu action function.
+ *
+ * @param {Object} conleaf an object describing the leaf to be added.  Has the
+ * following keys:
+ *
+ * - `before` Boolean, insert this leaf beofre or fter the target
+ * - `label` String, the label of the node to insert
+ * - `word` String, the text of the node to insert
+ * @param {Node} node
+ * @returns {Function} A function which, when called, will execute the action.
+ * @private
+ */
+function doConLeaf(conleaf, node) {
+    return function() {
+        makeLeaf(conleaf.before, conleaf.label, conleaf.word, node, true);
+        undoBarrier();
+        hideContextMenu();
+    };
+}
+
+// Local Variables:
+// js2-additional-externs: ("$" "setTimeout" "customCommands\
+// " "customConLeafBefore" "customConMenuGroups" "extensions" "vextensions\
+// " "clause_extensions" "JSON" "makeLeaf" "stackTree" "getLabel" "setNodeLabel\
+// " "hideContextMenu" "clearSelection" "toggleExtension" "selectNode\
+// " "parseIndex" "parseLabel" "defaultConMenuGroup" "getIndex" "parseIndexType\
+// " "displayCaseMenu" "caseTags" "casePhrases" "hasCase" "touchTree\
+// " "startnode" "_" "setCase" "caseBarriers" "isCasePhrase" "isCaseNode\
+// " "isCaseLabel" "labelHasCase" "labelGetCase" "labelRemoveCase" "shouldIndexLeaf\
+// " "undoBarrier")
+// indent-tabs-mode: nil
+// End:
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addCommand">addCommand</a></li><li><a href="global.html#addConLeafAfter">addConLeafAfter</a></li><li><a href="global.html#addConLeafBefore">addConLeafBefore</a></li><li><a href="global.html#addConMenuGroup">addConMenuGroup</a></li><li><a href="global.html#clearSearchMatches">clearSearchMatches</a></li><li><a href="global.html#clearSelection">clearSelection</a></li><li><a href="global.html#coIndex">coIndex</a></li><li><a href="global.html#currentText">currentText</a></li><li><a href="global.html#currentTextPretty">currentTextPretty</a></li><li><a href="global.html#displayError">displayError</a></li><li><a href="global.html#displayInfo">displayInfo</a></li><li><a href="global.html#displayRename">displayRename</a></li><li><a href="global.html#displayWarning">displayWarning</a></li><li><a href="global.html#editLemma">editLemma</a></li><li><a href="global.html#editNode">editNode</a></li><li><a href="global.html#endnode">endnode</a></li><li><a href="global.html#flagSearchMatch">flagSearchMatch</a></li><li><a href="global.html#getCase">getCase</a></li><li><a href="global.html#getIndex">getIndex</a></li><li><a href="global.html#getIndexType">getIndexType</a></li><li><a href="global.html#getLabel">getLabel</a></li><li><a href="global.html#getLemma">getLemma</a></li><li><a href="global.html#getTokenRoot">getTokenRoot</a></li><li><a href="global.html#guessLeafNode">guessLeafNode</a></li><li><a href="global.html#hasCase">hasCase</a></li><li><a href="global.html#hasDashTag">hasDashTag</a></li><li><a href="global.html#hideDialogBox">hideDialogBox</a></li><li><a href="global.html#ignoringUndo">ignoringUndo</a></li><li><a href="global.html#isCaseLabel">isCaseLabel</a></li><li><a href="global.html#isCaseNode">isCaseNode</a></li><li><a href="global.html#isCasePhrase">isCasePhrase</a></li><li><a href="global.html#isEmpty">isEmpty</a></li><li><a href="global.html#isEmptyNode">isEmptyNode</a></li><li><a href="global.html#isLeafNode">isLeafNode</a></li><li><a href="global.html#isPossibleTarget">isPossibleTarget</a></li><li><a href="global.html#isRootNode">isRootNode</a></li><li><a href="global.html#labelGetCase">labelGetCase</a></li><li><a href="global.html#labelHasCase">labelHasCase</a></li><li><a href="global.html#labelRemoveCase">labelRemoveCase</a></li><li><a href="global.html#leafAfter">leafAfter</a></li><li><a href="global.html#leafBefore">leafBefore</a></li><li><a href="global.html#makeLeaf">makeLeaf</a></li><li><a href="global.html#makeNode">makeNode</a></li><li><a href="global.html#maxIndex">maxIndex</a></li><li><a href="global.html#moveNode">moveNode</a></li><li><a href="global.html#moveNodes">moveNodes</a></li><li><a href="global.html#nextSearchMatch">nextSearchMatch</a></li><li><a href="global.html#nukeUndo">nukeUndo</a></li><li><a href="global.html#pruneNode">pruneNode</a></li><li><a href="global.html#redo">redo</a></li><li><a href="global.html#registerDeletedRootTree">registerDeletedRootTree</a></li><li><a href="global.html#registerNewRootTree">registerNewRootTree</a></li><li><a href="global.html#removeCase">removeCase</a></li><li><a href="global.html#scrollToNext">scrollToNext</a></li><li><a href="global.html#scrollToShowSel">scrollToShowSel</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchNodePostAdd">searchNodePostAdd</a></li><li><a href="global.html#selectNode">selectNode</a></li><li><a href="global.html#setCase">setCase</a></li><li><a href="global.html#setLabel">setLabel</a></li><li><a href="global.html#setNodeLabel">setNodeLabel</a></li><li><a href="global.html#shouldIndexLeaf">shouldIndexLeaf</a></li><li><a href="global.html#showDialogBox">showDialogBox</a></li><li><a href="global.html#showMessageHistory">showMessageHistory</a></li><li><a href="global.html#startnode">startnode</a></li><li><a href="global.html#styleDashTag">styleDashTag</a></li><li><a href="global.html#styleTag">styleTag</a></li><li><a href="global.html#styleTags">styleTags</a></li><li><a href="global.html#toggleCollapsed">toggleCollapsed</a></li><li><a href="global.html#toggleExtension">toggleExtension</a></li><li><a href="global.html#toggleLemmata">toggleLemmata</a></li><li><a href="global.html#touchTree">touchTree</a></li><li><a href="global.html#undo">undo</a></li><li><a href="global.html#undoAbortTransaction">undoAbortTransaction</a></li><li><a href="global.html#undoBeginTransaction">undoBeginTransaction</a></li><li><a href="global.html#undoEndTransaction">undoEndTransaction</a></li><li><a href="global.html#updateCssClass">updateCssClass</a></li><li><a href="global.html#wnodeString">wnodeString</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 12:50:31 GMT+0000 (Greenwich Mean Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
